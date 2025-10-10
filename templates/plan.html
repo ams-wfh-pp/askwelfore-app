@@ -803,6 +803,55 @@
                 }
             }
             
+            // Validate Step 5: All required lifestyle fields
+            if (currentStep === 5) {
+                const requiredFields = [
+                    { id: 'activity_level', label: 'Activity Level' },
+                    { id: 'food_access', label: 'Fresh Food Access' },
+                    { id: 'food_budget', label: 'Weekly Food Budget' },
+                    { id: 'meals_per_day', label: 'Meals Per Day' }
+                ];
+                
+                let allValid = true;
+                let firstInvalid = null;
+                
+                // Remove any old validation messages
+                document.querySelectorAll('.validation-message').forEach(msg => msg.remove());
+                
+                requiredFields.forEach(fieldInfo => {
+                    const field = document.getElementById(fieldInfo.id);
+                    if (field && (!field.value || field.value.trim() === '')) {
+                        allValid = false;
+                        if (!firstInvalid) firstInvalid = field;
+                        
+                        // Visual cue
+                        field.style.border = '2px solid #ff6b6b';
+                        field.setAttribute('aria-invalid', 'true');
+                        
+                        // Friendly inline message
+                        const msg = document.createElement('div');
+                        msg.className = 'validation-message';
+                        msg.style.color = '#ff6b6b';
+                        msg.style.fontSize = '0.9em';
+                        msg.style.marginTop = '4px';
+                        msg.style.marginBottom = '10px';
+                        msg.setAttribute('aria-live', 'assertive');
+                        msg.innerText = 'Please complete this field before continuing.';
+                        field.insertAdjacentElement('afterend', msg);
+                    } else if (field) {
+                        // Reset valid appearance
+                        field.style.border = '2px solid #e2e8f0';
+                        field.removeAttribute('aria-invalid');
+                    }
+                });
+                
+                if (!allValid) {
+                    alert('Please complete all required lifestyle questions before continuing.');
+                    if (firstInvalid) firstInvalid.focus();
+                    return false;
+                }
+            }
+            
             if (currentStep < totalSteps) {
                 currentStep++;
                 showStep(currentStep);
@@ -863,6 +912,16 @@
         document.addEventListener('change', function(e) {
             if (e.target.name && (e.target.name.includes('_foods') || e.target.name.includes('_foods_other'))) {
                 updateColorCount();
+            }
+            
+            // Clear validation errors when user selects a value
+            if (e.target.tagName === 'SELECT' && e.target.value) {
+                e.target.style.border = '2px solid #e2e8f0';
+                e.target.removeAttribute('aria-invalid');
+                const nextSibling = e.target.nextElementSibling;
+                if (nextSibling && nextSibling.classList.contains('validation-message')) {
+                    nextSibling.remove();
+                }
             }
         });
 
