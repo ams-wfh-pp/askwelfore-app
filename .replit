@@ -1,7 +1,15 @@
 language = "python3"
 modules = ["python-3.11"]
 
+# WelFore Health | AskWelFore App Configuration
+# Defines how Replit runs and deploys your FastAPI app
+
 run = "python3 -m uvicorn main:app --host=0.0.0.0 --port=5000"
+
+[deployment]
+# Required for Replit Deploy (Cloud Run)
+deploymentTarget = "cloudrun"
+
 
 [[ports]]
 localPort = 5000
