@@ -1,0 +1,260 @@
+🚀 FINAL REPLIT AGENT IMPLEMENTATION BRIEF
+
+Project: AskWelFore App Finalization – Global Award Edition
+Client: WelFore Health
+Recognition: Global Digital Health Hub Awards – Finalist in Wellness & Prevention 2025
+
+✉️ Cover Message
+
+Hi [Agent Name],
+
+We’re finalizing the AskWelFore app following our recognition as a Global Finalist in the 2025 Digital Health Hub Awards (Wellness & Prevention).
+
+Please do not overwrite the last working version — instead, integrate the updates below to strengthen reliability, improve the user experience, and align visuals with WelFore’s global recognition.
+
+All additions should be modular and non-destructive, preserving the last stable state while enhancing the app for production readiness.
+
+🧭 Version Control & Safeguard Instructions
+
+Duplicate the current working directory and name it /backup_pre_award_patch or create a Git branch named pre_award_version.
+
+Confirm that the backup version runs successfully (uvicorn main:app --reload).
+
+Apply all changes described below only as additive updates — do not overwrite routes or logic that currently work.
+
+Commit with the message noted under Changelog Summary at the bottom of this brief.
+
+Once done, test /quiz, /plan, and /health endpoints to confirm all legacy functionality remains intact.
+
+🧩 Implementation Scope
+🔹 1. Backend Robustness – main.py
+
+Add this Safety Patch immediately after imports and app initialization:
+
+# ---- SAFETY PATCH START ----
+import importlib.util
+from fastapi.responses import JSONResponse
+
+required_packages = ["fastapi", "jinja2", "requests", "python-multipart"]
+missing = [pkg for pkg in required_packages if importlib.util.find_spec(pkg) is None]
+
+if missing:
+    print(f"⚠️ Warning: Missing packages detected: {', '.join(missing)}. "
+          "App will continue running, but some features may not work properly.")
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    print(f"❌ Exception caught: {exc}")
+    return JSONResponse(status_code=500, content={"error": "Internal server error."})
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
+print("✅ Safety patch loaded successfully")
+# ---- SAFETY PATCH END ----
+
+
+✅ Purpose: Prevents crashes when python-multipart or other dependencies are missing, adds a health check route, and ensures graceful JSON-based error handling.
+
+🔹 2. Frontend Experience – Sequential Questionnaire
+
+Replace the current /templates/quiz.html with this version.
+It introduces the award banner, step-by-step flow, and animated progress bar, while remaining fully compatible with the existing /static/styles.css (Agent3).
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AskWelFore | Personalized Wellness Quiz</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- 🏆 Global Recognition Banner -->
+        <div class="award-banner">
+            <img src="/static/WELFORE.png" alt="Digital Health Hub Rising Star Finalist 2025 - WelFore Health">
+            <p class="award-caption">🏆 Recognized Globally for Innovation in Wellness & Prevention</p>
+        </div>
+
+        <!-- 🌟 Intro -->
+        <div class="intro">
+            <h1>Welcome to the AskWelFore Wellness Reset</h1>
+            <p style="text-align:center; color:#4a5568; max-width:650px; margin:auto; line-height:1.6;">
+                Let’s personalize your Flavor-First, Family-Centered path to better health.
+                This guided quiz helps us match your favorite cuisines and goals
+                to a plan designed with bold flavor and balanced nutrition in mind.
+            </p>
+        </div>
+
+        <!-- 📊 Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+
+        <!-- 🌈 Sequential Questionnaire -->
+        <form id="quizForm" method="POST" action="/submit">
+            <div class="question active">
+                <h2>1️⃣ What’s your name?</h2>
+                <input type="text" name="name" placeholder="Enter your name" required>
+                <button type="button" onclick="nextQuestion()">Next</button>
+            </div>
+
+            <div class="question">
+                <h2>2️⃣ What’s your top health goal?</h2>
+                <select name="goal" required>
+                    <option value="">Select one...</option>
+                    <option value="weight">Weight Management</option>
+                    <option value="blood_pressure">Lower Blood Pressure</option>
+                    <option value="blood_sugar">Stabilize Blood Sugar</option>
+                    <option value="energy">Increase Energy</option>
+                    <option value="digestive">Improve Gut Health</option>
+                </select>
+                <button type="button" onclick="nextQuestion()">Next</button>
+            </div>
+
+            <div class="question">
+                <h2>3️⃣ Which cuisines make you happiest?</h2>
+                <div class="cuisine-table">
+                    <div class="cuisine-column">
+                        <h4>🌍 Global Classics</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Italian"> Italian</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Mexican"> Mexican</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Asian"> Asian</label>
+                    </div>
+                    <div class="cuisine-column">
+                        <h4>🌴 Island & Coastal</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Caribbean"> Caribbean</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Creole"> Creole</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Mediterranean"> Mediterranean</label>
+                    </div>
+                    <div class="cuisine-column">
+                        <h4>🥗 Plant-Rich & Modern</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Vegetarian"> Vegetarian</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Fusion"> Fusion</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Other"> Other</label>
+                    </div>
+                </div>
+                <button type="button" onclick="nextQuestion()">Next</button>
+            </div>
+
+            <div class="question">
+                <h2>4️⃣ How many meals do you typically eat per day?</h2>
+                <select name="meals_per_day" required>
+                    <option value="">Select one...</option>
+                    <option value="2">2 Meals</option>
+                    <option value="3">3 Meals</option>
+                    <option value="4">4 Meals</option>
+                    <option value="5+">5+ Meals</option>
+                </select>
+                <button type="button" onclick="nextQuestion()">Next</button>
+            </div>
+
+            <div class="question">
+                <h2>5️⃣ What’s your biggest challenge with healthy eating?</h2>
+                <textarea name="challenge" rows="4" style="width:100%;border-radius:8px;padding:10px;" placeholder="Example: time, taste, cost, variety..." required></textarea>
+                <button type="submit">Get My Personalized Plan</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let current = 0;
+        const questions = document.querySelectorAll('.question');
+        const progress = document.querySelector('.progress');
+
+        function showQuestion(index) {
+            questions.forEach((q, i) => {
+                q.classList.toggle('active', i === index);
+                q.style.display = i === index ? 'block' : 'none';
+            });
+            progress.style.width = `${(index / (questions.length - 1)) * 100}%`;
+        }
+
+        function nextQuestion() {
+            if (current < questions.length - 1) {
+                current++;
+                showQuestion(current);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => showQuestion(current));
+    </script>
+
+    <style>
+        .award-banner { text-align:center; margin-bottom:25px; }
+        .award-banner img { max-width:220px; filter:drop-shadow(0 3px 8px rgba(0,0,0,0.2)); }
+        .award-caption { font-size:0.95rem; color:#4a5568; font-weight:600; margin-top:8px; }
+        .progress-bar { width:100%; height:8px; background:rgba(102,126,234,0.15); border-radius:4px; margin:15px 0 25px 0; }
+        .progress { height:100%; background:linear-gradient(135deg,#667eea,#764ba2); border-radius:4px; width:0%; transition:width 0.4s ease; }
+        .question { display:none; }
+        .question.active { display:block; animation:fadeIn 0.5s ease; }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+    </style>
+</body>
+</html>
+
+🔹 3. Plan Results Page – /templates/plan.html
+
+Add award banner + trust header above personalized plan results:
+
+<div class="container">
+    <div class="award-banner">
+        <img src="/static/WELFORE.png" alt="Digital Health Hub Rising Star Finalist 2025 - WelFore Health">
+        <p class="award-caption">🏆 Recognized Globally for Innovation in Wellness & Prevention</p>
+    </div>
+
+    {% if error %}
+        <div class="error">
+            <h2>Oops! Something went wrong.</h2>
+            <p>{{ error_message }}</p>
+        </div>
+    {% endif %}
+
+    {% if result %}
+        <div class="confirmation">
+            <h2>🌈 Your Personalized Meal Plan</h2>
+            <p><strong>{{ result.name }}</strong>, here’s your Flavor-First plan to reach your {{ result.goal }} goal.</p>
+            <p>Generated on {{ generated_at }}</p>
+        </div>
+    {% endif %}
+
+    {% if plan %}
+        <div class="summary">
+            <h3>Plan Summary</h3>
+            <ul>
+                {% for item in plan %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+
+🔹 4. Static Files
+
+Award badge file: /static/WELFORE.png
+
+Keep /static/styles.css (Agent3 version) as-is.
+
+Inline CSS above adds only minimal enhancements (safe to merge).
+
+✅ Testing Checklist
+
+Run: pip install -r requirements.txt → confirm python-multipart included.
+
+Test /health → should return { "status": "ok" }.
+
+Load /quiz → confirm sequential question flow and progress bar.
+
+Submit → verify /plan displays award banner and personalized summary.
+
+Temporarily remove a package → confirm no crash (warning logged only).
+
+🧾 Changelog Summary
+
+Commit: Add robust safety patch, sequential questionnaire, progress bar, and award-winning branding elements to AskWelFore app — preserving last known working version and ensuring all updates are additive, not destructive.
+
+End of Implementation Brief
