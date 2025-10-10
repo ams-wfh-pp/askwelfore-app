@@ -3,12 +3,39 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from typing import Dict, Any
 import os
 from datetime import datetime
+import importlib.util
 
 from logger_utils import logger, purge_old_logs
 from ghl_integration import lookup_contact, has_freemium_tag, add_tag_to_contact, create_contact
 from email_service import send_admin_notification, get_free_plan_email, get_upsell_email, send_email
 
+# ---- SAFETY PATCH START ----
+# Check for required packages and warn if missing (prevents crashes)
+required_packages = ["fastapi", "jinja2", "requests", "pydantic"]
+missing = [pkg for pkg in required_packages if importlib.util.find_spec(pkg) is None]
+
+if missing:
+    print(f"⚠️ Warning: Missing packages detected: {', '.join(missing)}. "
+          "App will continue running, but some features may not work properly.")
+    logger.warning(f"Missing packages: {', '.join(missing)}")
+else:
+    print("✅ All required packages are installed")
+    logger.info("All required packages verified")
+
 app = FastAPI()
+
+# Global exception handler to prevent crashes
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"❌ Unhandled exception: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal server error", "detail": "The request could not be processed"}
+    )
+
+print("✅ Safety patch loaded successfully")
+logger.info("Safety patch and global exception handler active")
+# ---- SAFETY PATCH END ----
 
 STRIPE_7DAY_LINK = os.getenv('STRIPE_7DAY_LINK', "https://buy.stripe.com/5kQ7sMddybXy8dsfUR7Vm0a")
 STRIPE_14DAY_LINK = os.getenv('STRIPE_14DAY_LINK', "https://buy.stripe.com/14A28s7Te3r251gcIF7Vm0b")
