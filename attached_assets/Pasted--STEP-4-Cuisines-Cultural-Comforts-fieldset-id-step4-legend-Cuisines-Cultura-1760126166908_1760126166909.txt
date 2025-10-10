@@ -1,0 +1,115 @@
+<!-- STEP 4: Cuisines & Cultural Comforts -->
+<fieldset id="step4">
+  <legend>🍽️ Cuisines & Cultural Comforts</legend>
+  <div class="fieldset-description">
+    Every region has its own flavor story — from Louisiana spice to Pacific fusion, West African stews to Mediterranean comfort.  
+    Select all the cuisines that make you feel at home, reflect your roots, or spark your curiosity. 🌍
+  </div>
+
+  <div class="cuisine-table">
+
+    <!-- 🇺🇸 American Regional Traditions -->
+    <div class="cuisine-column">
+      <h4>American Regional Traditions 🇺🇸</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="New England & Northeast"> New England & Northeast – Seafood, chowders, maple, cranberries</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mid-Atlantic"> Mid-Atlantic – Deli culture, bagels, crab boils</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southern & Soul Food"> Southern & Soul Food – Fried chicken, greens, cornbread</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Creole / Cajun / Gulf Coast"> Creole / Cajun / Gulf Coast – Gumbo, étouffée</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Midwestern Comforts"> Midwestern Comforts – BBQ, casseroles, pierogi</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Tex-Mex & Southwest"> Tex-Mex & Southwest – Tacos, chili, grilled peppers</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="California Fresh & Coastal Fusion"> California Fresh & Coastal Fusion – Avocado, citrus, Pacific Rim</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Pacific Northwest"> Pacific Northwest – Salmon, coffee culture, farm-to-table</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Hawaiian & Polynesian"> Hawaiian & Polynesian – Poke, pineapple, island BBQ</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Alaska Native & Arctic"> Alaska Native & Arctic – Salmon, seal, berries</label>
+    </div>
+
+    <!-- 🪶 Indigenous & Native Traditions -->
+    <div class="cuisine-column">
+      <h4>Indigenous & Native Traditions 🪶</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Native American"> Native American (Cherokee, Navajo, Pueblo, Sioux)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Alaska Native"> Alaska Native (Inuit, Yup’ik, Aleut, Tlingit)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Native Hawaiian"> Native Hawaiian</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Pacific Islander"> Pacific Islander (Samoan, Tongan, Fijian, Micronesian)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Aboriginal Australian / Torres Strait Islander"> Aboriginal Australian / Torres Strait Islander</label>
+    </div>
+
+    <!-- 🌍 African Diaspora -->
+    <div class="cuisine-column">
+      <h4>African Diaspora 🌍</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="African American / Gullah Geechee"> African American / Gullah Geechee</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="West African"> West African (Nigeria, Ghana, Senegal)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East African"> East African (Ethiopia, Kenya, Tanzania)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="North African"> North African (Morocco, Tunisia, Egypt)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southern African"> Southern African (South Africa, Zimbabwe, Botswana)</label>
+    </div>
+
+    <!-- 🏝️ Caribbean -->
+    <div class="cuisine-column">
+      <h4>Caribbean 🏝️</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Jamaican"> Jamaican</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Trinidad & Tobago"> Trinidad & Tobago</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Haitian"> Haitian</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Cuban"> Cuban</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Puerto Rican"> Puerto Rican</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Dominican"> Dominican</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="U.S. Virgin Islands"> U.S. Virgin Islands 🇻🇮</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Other Caribbean"> Other Caribbean</label>
+    </div>
+
+    <!-- 🌮 Latin American -->
+    <div class="cuisine-column">
+      <h4>Latin American 🌮</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mexican"> Mexican</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Central American"> Central American (Guatemala, El Salvador, Honduras)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South American"> South American (Peru, Brazil, Chile, Argentina)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="U.S. Latinx Fusion"> U.S. Latinx Fusion (Cali-Mex, Southwest)</label>
+    </div>
+
+    <!-- 🍜 Asian & Middle Eastern -->
+    <div class="cuisine-column">
+      <h4>Asian & Middle Eastern 🍜</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South Asian"> South Asian (India, Pakistan, Sri Lanka, Bangladesh)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East Asian"> East Asian (China, Japan, Korea)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southeast Asian"> Southeast Asian (Thailand, Vietnam, Philippines, Indonesia)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Central Asian"> Central Asian (Uzbek, Kazakh, Mongolian)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Middle Eastern"> Middle Eastern (Lebanon, Iran, Turkey, Palestine, Israel)</label>
+    </div>
+
+    <!-- 🧀 European & Mediterranean -->
+    <div class="cuisine-column">
+      <h4>European & Mediterranean 🧀</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Italian"> Italian</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Greek"> Greek</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="French"> French</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Spanish / Tapas"> Spanish / Tapas</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Portuguese"> Portuguese</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mediterranean"> Mediterranean (Mixed Regions)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Eastern European"> Eastern European (Polish, Ukrainian, Hungarian)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="British / Irish"> British / Irish</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Nordic"> Nordic (Scandinavian)</label>
+    </div>
+
+    <!-- 🌀 Fusion / Other -->
+    <div class="cuisine-column">
+      <h4>Fusion / Other 🌀</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Modern Global Fusion"> Modern Global Fusion</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Plant-Based World Cuisine"> Plant-Based World Cuisine</label>
+      <label class="checkbox-label"><input type="checkbox" id="otherCuisineCheck" name="cuisines" value="Other"> Other (please specify)</label>
+      <input type="text" id="otherCuisineText" name="cuisines_other" placeholder="Enter other cuisines or regional dishes..." style="display:none; margin-top:10px; width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+    </div>
+
+  </div>
+
+  <div class="footer-note">
+    <em>Your region and culture tell your flavor story — we’ll use them to make healthy taste like home.</em>
+  </div>
+</fieldset>
+
+<script>
+  // Show text field when "Other" is checked
+  const otherCheck = document.getElementById("otherCuisineCheck");
+  const otherText = document.getElementById("otherCuisineText");
+  otherCheck.addEventListener("change", () => {
+    otherText.style.display = otherCheck.checked ? "block" : "none";
+  });
+</script>

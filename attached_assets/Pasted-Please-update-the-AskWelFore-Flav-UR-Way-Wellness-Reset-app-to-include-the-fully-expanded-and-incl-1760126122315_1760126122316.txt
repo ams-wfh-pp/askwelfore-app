@@ -1,0 +1,71 @@
+Please update the AskWelFore / Flav.UR.Way Wellness Reset app to include the fully expanded and inclusive Step 4: Cuisines & Cultural Comforts section below.
+
+🔹 Goal: Replace the current Step 4 fieldset in quiz.html (or plan.html, depending on which controls the quiz interface) with the HTML block provided below.
+🔹 Maintain all existing logic:
+
+Form data should still post to cuisines[] and cuisines_other.
+
+Validation, navigation, and progress tracking must remain functional.
+
+Autofill from GHL (name, email, phone) must remain unchanged.
+
+🔹 UI Requirements:
+
+Use the .cuisine-table and .cuisine-column structure for responsive two-column layout.
+
+Ensure proper scroll behavior and alignment on mobile.
+
+Keep existing typography and styling from styles.css.
+
+When the “Other” checkbox is selected, display the text input field below it (id="otherCuisineText").
+
+Confirm that all 8 major cuisine categories render:
+
+American Regional Traditions 🇺🇸
+
+Indigenous & Native Traditions 🪶
+
+African Diaspora 🌍
+
+Caribbean 🏝️ (including U.S. Virgin Islands 🇻🇮)
+
+Latin American 🌮
+
+Asian & Middle Eastern 🍜
+
+European & Mediterranean 🧀
+
+Fusion / Other 🌀
+
+🔹 Accessibility & Aesthetics:
+
+Preserve ARIA labels and keyboard navigation.
+
+Ensure headings and checkboxes maintain readable contrast.
+
+Footer note should read:
+“Your region and culture tell your flavor story — we’ll use them to make healthy taste like home.”
+
+🔹 Validation:
+
+Keep Step 4 mandatory (user must select at least one cuisine before continuing).
+
+“Other” text field is optional but must only appear when its checkbox is checked.
+
+After implementing, please:
+
+Verify that the app runs without console or CSS errors.
+
+Confirm that Step 4 now displays all eight global categories and that the “Other” field functions dynamically.
+
+Test full 6-step navigation, ensuring that selections persist and submit properly.
+
+Keep progress tracker text (“Step 4 of 6”) visible and consistent in style with Steps 1–6.
+
+Here is the complete HTML block to insert:
+(Paste exactly as provided)
+
+[Insert the full HTML block from previous message here]
+
+
+Once complete, please confirm that Step 4 renders correctly across desktop and mobile, and that all cuisine groups and territories (including Alaska, Hawaii, and U.S. Virgin Islands) appear as selectable options.
