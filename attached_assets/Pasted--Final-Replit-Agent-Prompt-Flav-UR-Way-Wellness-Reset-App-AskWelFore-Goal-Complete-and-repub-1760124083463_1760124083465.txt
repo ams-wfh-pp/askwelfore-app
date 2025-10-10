@@ -1,0 +1,319 @@
+🧠 Final Replit Agent Prompt — Flav.UR.Way Wellness Reset App (AskWelFore)
+
+Goal:
+Complete and republish the Flav.UR.Way Wellness Reset app with the final feature set, inclusive of the Eat-the-Rainbow framework, cultural cuisine expansion, GHL autofill logic, and multi-ethnic visuals.
+Important: Do not overwrite the last working backend (main.py). Only update the front-end templates, styling, and light JS interactivity.
+
+✅ 1. GENERAL REQUIREMENTS
+
+Keep the app fully operational on FastAPI with no changes to routes or field names expected by main.py.
+
+Maintain sequential step logic and progress bar (“Step X of 6”).
+
+Preserve backend form field compatibility for:
+red_foods, orange_foods, yellow_foods, green_foods, purple_foods, white_foods, their _other variants, dietary_restrictions, cuisines, cuisines_other, lifestyle (with new keys), and plan_duration.
+
+Ensure gentle validations (no hard errors).
+
+Keep the award/trust ribbons and motivational copy visible across all steps.
+
+🌈 2. STEP-BY-STEP UPDATES
+Step 1 — About You
+
+✅ Already perfect.
+✅ Keep breastfeeding logic intact.
+✅ Add the autofill script (see section 6) just after <body> opens.
+
+Step 2 — Eat the Rainbow
+
+Replace existing Step-2 fieldset with the upgraded version below:
+
+Each color group displays:
+
+Multiple checkbox options (from food_options dict).
+
+“Other favorites (comma-separated)” text field beneath each color.
+
+Live per-color count (“Selected X”).
+
+At least one food selection across all colors is mandatory before progressing.
+
+Add encouraging microcopy:
+
+“Aim for all six colors daily — each one adds its own nutrients and healing power!”
+
+Include a total count summary:
+“You’ve picked X items across the rainbow so far!”
+
+Step 3 — Health Goals & Dietary Preferences
+
+Replace dietary restriction input with multi-select checkboxes:
+
+Gluten-free  
+Dairy-free  
+Nut-free  
+Shellfish-free  
+Vegetarian  
+Vegan  
+Halal  
+Kosher  
+Fasting (intermittent/religious)  
+Other → [text box]
+
+
+All selections map to the existing dietary_restrictions list.
+
+Add an optional text area:
+“What does feeling your best look like to you?”
+
+Step 4 — Cuisines & Cultural Comforts (Expanded)
+
+Replace the current cuisine fieldset with the full multi-region version below (group headings included for visual clarity):
+
+🪶 Indigenous & Native American
+
+Navajo
+
+Cherokee
+
+Lakota / Sioux
+
+Pueblo
+
+Other Indigenous
+
+🍠 African American & Soul Food
+
+Soul Food (Southern US)
+
+Gullah Geechee
+
+Creole (New Orleans)
+
+Cajun
+
+🏝️ Caribbean
+
+Jamaican 🇯🇲
+
+Trinidad & Tobago 🇹🇹
+
+Haitian 🇭🇹
+
+Cuban 🇨🇺
+
+Puerto Rican 🇵🇷
+
+Dominican 🇩🇴
+
+Other Caribbean
+
+🌍 African
+
+West African (Nigeria, Ghana, Senegal)
+
+East African (Ethiopia, Eritrea, Kenya)
+
+North African (Morocco, Tunisia, Egypt)
+
+Southern African (South Africa, Zimbabwe)
+
+Other African
+
+🌮 Latin American
+
+Mexican
+
+Central American
+
+South American (Colombia, Peru, Brazil)
+
+Other Latin
+
+🌏 Asian & Middle Eastern
+
+South Asian (India, Pakistan, Sri Lanka)
+
+East Asian (China, Japan, Korea)
+
+Southeast Asian (Thailand, Vietnam, Philippines, Indonesia)
+
+Middle Eastern (Lebanon, Turkey, Persia)
+
+🇪🇺 European
+
+Italian
+
+Greek
+
+French
+
+Spanish / Tapas
+
+Mediterranean
+
+Fusion / Modern Global
+
+🌀 Other or Fusion Influences
+
+Checkbox: “Other”
+
+Text field: “Tell us about other food traditions, regions, or dishes that inspire you.”
+
+Include guiding copy:
+
+“We use this to celebrate your food roots — no cuisine is ever off the table here.”
+
+Keep backend consistency with cuisines + cuisines_other.
+
+Step 5 — Lifestyle & Habits
+
+Enhance with more human, engaging tone and multi-ethnic emoji diversity.
+
+Activity Level (replace emojis):
+
+🧍🏽‍♂️ Sedentary – mostly sitting  
+🏃🏾‍♀️ Lightly Active – light exercise 1–3 days/week  
+🧘🏽‍♀️ Moderately Active – movement 3–5 days/week  
+🏋🏿‍♂️ Very Active – intense exercise 6–7 days/week  
+
+
+New Fields to Add:
+
+Snacking Frequency:
+“How often do you snack between meals?”
+
+Rarely (I’m good until meals)
+
+Occasionally (1–2 times/day)
+
+Frequently (3+ times/day)
+
+Constant grazer 😄
+
+Kitchen Tools (multi-select):
+Stove
+Oven
+Microwave
+Air Fryer
+Blender / Food Processor
+Refrigerator / Freezer
+
+Family Size: (numeric input, default 1)
+
+Keep consistent with backend field family_size.
+
+All new values should save under lifestyle (keys: snacking, kitchen_tools).
+
+Step 6 — Choose Your Plan
+
+No structural changes; only update text for brand consistency:
+
+Rename to: “Personalize Your Flav.UR.Way Wellness Blueprint”
+
+Keep free vs. premium logic intact.
+
+Use trust badge:
+“Recognized globally for innovation in Wellness & Prevention — Digital Health Hub Finalist 2025.”
+
+🎨 3. MULTI-ETHNIC ICONS
+
+Replace all existing single-tone emojis in Step 5 and any person icons throughout with multi-skin-tone versions (neutral to medium tones).
+Ensure they render as standard Unicode and not SVG assets.
+
+🔄 4. VALIDATION & UX ENHANCEMENTS
+
+Each step must validate required fields before advancing, using friendly in-page reminders.
+
+Show progress text “Step X of 6” + progress bar.
+
+Keep “Next” and “Back” buttons consistent (rounded gradient buttons).
+
+🔗 5. TRUST RIBBON (Global)
+
+At bottom of each step, include:
+
+🏅 Backed by 10+ years of research and real-world results — including an ADA-funded clinical study with Eastern Virginia Medical School.
+
+Final step (Step 6) changes to:
+
+🌿 Recognized globally for innovation in Wellness & Prevention — Digital Health Hub Finalist 2025.
+
+⚙️ 6. GHL INTEGRATION — AUTO-FILL LOGIC
+
+Add this JS snippet right after the <body> tag in the Step 1 template:
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('first_name')) document.getElementById('name').value = params.get('first_name');
+  if (params.get('email')) {
+    const emailField = document.getElementById('email');
+    if (emailField) emailField.value = params.get('email');
+  }
+  if (params.get('phone')) {
+    const phoneField = document.getElementById('phone');
+    if (phoneField) phoneField.value = params.get('phone');
+  }
+</script>
+
+
+This ensures users coming from GoHighLevel links like:
+
+https://27089137-8697-4689-b36d-8a602157fef1-00-113e2z1dz8j0x.riker.replit.dev/plan?first_name={{contact.first_name}}&email={{contact.email}}&phone={{contact.phone}}
+
+
+have their Step 1 fields pre-filled automatically.
+
+🧾 7. VALIDATION CHECKS BEFORE REPUBLISHING
+
+Before you push live:
+
+Test each step transition (Step 1 → 6).
+
+Confirm rainbow foods validate correctly.
+
+Verify multiple dietary restrictions map to backend list.
+
+Confirm cuisine list displays full expanded version.
+
+Ensure GHL auto-fill works via URL query.
+
+Run one 3-day and one 7-day plan generation test.
+
+Ensure /plan renders correctly post-submission with meal plan summary, color tracking, and PDFs.
+
+🌐 8. REPUBLISH IN LIVE MODE
+
+After applying all above updates:
+
+Re-enable full Replit run environment.
+
+Confirm that Nix build completes successfully.
+
+Publish app at the live endpoint:
+https://askwelfore-app.replit.app
+
+Then update DNS or redirect rules from:
+https://start.welforehealth.com/flavurway → (this live endpoint).
+
+✅ 9. SUCCESS CRITERIA
+
+When complete, confirm:
+
+No syntax or dependency errors.
+
+App loads in under 3 seconds.
+
+Fully mobile-responsive.
+
+All 6 steps functional and emotionally engaging.
+
+Results page displays full personalized meal plan.
+
+GHL tagging triggers successfully.
+
+Freemium protection still enforced.
+
+Final note:
+This update must not overwrite backend logic — only augment the UX and form structure.
+The experience should feel warm, intelligent, and culturally inclusive — a true “Flav.UR.Way” digital wellness journey.

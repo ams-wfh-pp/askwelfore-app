@@ -269,6 +269,25 @@
     </style>
 </head>
 <body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const nameField = document.getElementById('name');
+            const emailField = document.getElementById('email');
+            const phoneField = document.getElementById('phone');
+            
+            if (params.get('first_name') && nameField) {
+                nameField.value = params.get('first_name');
+            }
+            if (params.get('email') && emailField) {
+                emailField.value = params.get('email');
+            }
+            if (params.get('phone') && phoneField) {
+                phoneField.value = params.get('phone');
+            }
+        });
+    </script>
+    
     <div class="container">
         <div class="award-banner">
             <img src="/static/WELFORE.png" alt="Digital Health Hub Rising Star Finalist 2025 - WelFore Health">
@@ -497,43 +516,76 @@
 
                 <div class="cuisine-table">
                     <div class="cuisine-column">
-                        <h4>Americas</h4>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="African American"> African American / Soul Food</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Caribbean"> Caribbean</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Creole"> Creole / Cajun</label>
+                        <h4>🪶 Indigenous & Native American</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Navajo"> Navajo</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Cherokee"> Cherokee</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Lakota"> Lakota / Sioux</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Pueblo"> Pueblo</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Other Indigenous"> Other Indigenous</label>
+                    </div>
+
+                    <div class="cuisine-column">
+                        <h4>🍠 African American & Soul Food</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Soul Food"> Soul Food (Southern US)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Gullah Geechee"> Gullah Geechee</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Creole"> Creole (New Orleans)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Cajun"> Cajun</label>
+                    </div>
+
+                    <div class="cuisine-column">
+                        <h4>🏝️ Caribbean</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Jamaican"> Jamaican 🇯🇲</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Trinidad & Tobago"> Trinidad & Tobago 🇹🇹</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Haitian"> Haitian 🇭🇹</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Cuban"> Cuban 🇨🇺</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Puerto Rican"> Puerto Rican 🇵🇷</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Dominican"> Dominican 🇩🇴</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Other Caribbean"> Other Caribbean</label>
+                    </div>
+
+                    <div class="cuisine-column">
+                        <h4>🌍 African</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="West African"> West African (Nigeria, Ghana, Senegal)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East African"> East African (Ethiopia, Eritrea, Kenya)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="North African"> North African (Morocco, Tunisia, Egypt)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southern African"> Southern African (South Africa, Zimbabwe)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Other African"> Other African</label>
+                    </div>
+
+                    <div class="cuisine-column">
+                        <h4>🌮 Latin American</h4>
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mexican"> Mexican</label>
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Central American"> Central American</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South American"> South American</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Cuban"> Cuban</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Puerto Rican"> Puerto Rican</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Dominican"> Dominican</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Native American"> Native American / Indigenous</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Tex-Mex"> Tex-Mex</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South American"> South American (Colombia, Peru, Brazil)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Other Latin"> Other Latin</label>
                     </div>
 
                     <div class="cuisine-column">
-                        <h4>Africa</h4>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="West African"> West African</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East African"> East African</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="North African"> North African</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southern African"> Southern African</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Caribbean-African Fusion"> Caribbean–African Fusion</label>
+                        <h4>🌏 Asian & Middle Eastern</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South Asian"> South Asian (India, Pakistan, Sri Lanka)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East Asian"> East Asian (China, Japan, Korea)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southeast Asian"> Southeast Asian (Thailand, Vietnam, Philippines, Indonesia)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Middle Eastern"> Middle Eastern (Lebanon, Turkey, Persia)</label>
                     </div>
 
                     <div class="cuisine-column">
-                        <h4>Asia, Middle East & Europe</h4>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South Asian"> South Asian (Indian, Pakistani, Sri Lankan)</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East Asian"> East Asian (Chinese, Japanese, Korean)</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southeast Asian"> Southeast Asian (Thai, Vietnamese, Filipino)</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Middle Eastern"> Middle Eastern (Lebanese, Persian, Turkish)</label>
+                        <h4>🇪🇺 European</h4>
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Italian"> Italian</label>
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Greek"> Greek</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Spanish"> Spanish / Tapas</label>
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="French"> French</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Spanish"> Spanish / Tapas</label>
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mediterranean"> Mediterranean</label>
+                    </div>
+
+                    <div class="cuisine-column">
+                        <h4>🌀 Fusion / Modern Global</h4>
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Fusion"> Fusion / Modern Global</label>
                     </div>
                 </div>
+                
+                <p style="color: #4a5568; font-style: italic; margin: 15px 0; font-size: 0.95rem;">
+                    💡 We use this to celebrate your food roots — no cuisine is ever off the table here.
+                </p>
                 
                 <label for="cuisines_other">Other or Fusion Influences</label>
                 <textarea id="cuisines_other" name="cuisines_other" rows="2" placeholder="Tell us about other food traditions, regions, or dishes that inspire you..."></textarea>
@@ -568,10 +620,10 @@
                 <label for="activity_level">What does a typical weekday look like for you? *</label>
                 <select id="activity_level" name="activity_level" required>
                     <option value="">Select...</option>
-                    <option value="sedentary">🪑 Sedentary — Mostly sitting or desk work</option>
-                    <option value="lightly_active">🚶 Lightly Active — Light exercise 1-3 days/week or active around the house</option>
-                    <option value="moderately_active">🏃 Moderately Active — Exercise 3-5 days/week, regular movement</option>
-                    <option value="very_active">💪 Very Active — Daily intense workouts or physical labor</option>
+                    <option value="sedentary">🧍🏽 Sedentary — Mostly sitting or desk work</option>
+                    <option value="lightly_active">🏃🏾 Lightly Active — Light exercise 1-3 days/week or active around the house</option>
+                    <option value="moderately_active">🧘🏽 Moderately Active — Exercise 3-5 days/week, regular movement</option>
+                    <option value="very_active">🏋🏿 Very Active — Daily intense workouts or physical labor</option>
                 </select>
                 
                 <label for="energy_levels">How would you describe your energy levels most days?</label>
@@ -655,9 +707,9 @@
 
             <!-- Step 6: Choose Your Plan -->
             <fieldset data-step="6">
-                <legend>🚀 You're Almost There!</legend>
+                <legend>🚀 Personalize Your Flav.UR.Way Wellness Blueprint</legend>
                 <div class="fieldset-description">
-                    You've personalized your Flav.UR.Way Wellness Blueprint — now let's unlock your plan. Start with a free 3-day taste test or go all in for 7 or 14 days of recipes, shopping lists, and practical flavor coaching.
+                    You've customized your wellness journey — now let's unlock your plan. Start with a free 3-day taste test or go all in for 7 or 14 days of recipes, shopping lists, and practical flavor coaching.
                 </div>
                 
                 <div class="plan-options">
@@ -691,7 +743,7 @@
                 </div>
                 
                 <div class="trust-ribbon">
-                    🌿 The Flav.UR.Way System — Recognized globally for innovation in Wellness & Prevention (Digital Health Hub Finalist, 2025).
+                    🌿 Recognized globally for innovation in Wellness & Prevention — Digital Health Hub Finalist 2025.
                 </div>
             </fieldset>
         </form>
