@@ -1,0 +1,178 @@
+🧠 Replit Agent — Final Enhancement Brief for AskWelFore / Flav.UR.Way Wellness Reset
+🔧 Objective
+
+Refine the 6-step AskWelFore Wellness Reset quiz to align fully with the Eat-the-Rainbow + Flavor-First model.
+Maintain all backend data compatibility with main.py (no breaking field names), but update quiz.html / plan.html templates to reflect the new UX, logic, and interactivity.
+
+✅ GLOBAL UPDATES
+
+Progress Tracker
+
+Show “Step X of 6” prominently at top (already works fine).
+
+Keep motivational sub-line:
+“You’re building your Flavor-First Wellness Blueprint!”
+
+Trust Ribbon
+
+Add persistent ribbon at bottom of every step (per previous spec).
+🏅 “Backed by 10+ years of research and real-world results — including an ADA-funded clinical study with Eastern Virginia Medical School.”
+
+Step 6 (final) can instead display:
+🌿 “Recognized globally for innovation in Wellness & Prevention — Digital Health Hub Finalist 2025.”
+
+Validation
+
+Make color selections (Step 2) mandatory: at least one item chosen across all colors.
+
+Use gentle, friendly alerts (no harsh modals).
+
+🌈 STEP 2 — Eat the Rainbow (REQUIRED FIX)
+
+Goal: Users select favorites within each color group, not just the color itself.
+
+Show sections for each color with:
+
+Multi-select checkboxes for suggested foods.
+
+A text field labeled “Other favorites (comma-separated)” per color.
+
+Live color counter (“Selected X”).
+
+Require at least one food selected total before continuing.
+
+Maintain backend field names:
+
+red_foods, red_foods_other, orange_foods, etc.
+
+Add friendly prompt beneath:
+
+“Aim for all six colors daily — each one adds its own nutrients and healing power!”
+
+💪 STEP 3 — Wellness Goals & Dietary Preferences
+
+Enhancements:
+
+Allow multiple dietary restrictions via checkboxes:
+
+Gluten-free
+
+Dairy-free
+
+Nut-free
+
+Shellfish-free
+
+Vegetarian
+
+Vegan
+
+Halal
+
+Kosher
+
+Fasting (intermittent / religious)
+
+Other → text input
+
+Keep “Primary health goal” as single-select dropdown.
+
+Optional text: “What does feeling your best look like to you?”
+
+Add logic to map new restriction array into the existing backend field dietary_restrictions (string list accepted by main.py).
+
+🍽️ STEP 4 — Cuisines, Culture & Comfort
+
+Enhancements:
+
+Keep Americas / Africa / Asia–Middle East–Europe groupings.
+
+Add final category labeled “Other or Fusion Influences”
+with open text box:
+
+“Tell us about other food traditions, regions, or dishes that inspire you.”
+
+Ensure “Other” checkbox reveals this input when selected.
+
+Maintain cuisines + cuisines_other consistency for backend.
+
+🏡 STEP 5 — Lifestyle & Habits
+
+Tone: friendly, practical, self-discovery.
+Additions:
+
+Add Snacking Behavior question:
+
+“How often do you snack between meals?”
+
+Options:
+
+Rarely (I’m good until meals)
+
+Occasionally (1-2 times/day)
+
+Frequently (3+ times/day)
+
+Constant grazer 😄
+
+Add Kitchen Access / Tools question:
+
+“Which tools do you have at home?” (multi-select)
+
+Stove
+
+Oven
+
+Microwave
+
+Air Fryer
+
+Blender / Food Processor
+
+Refrigerator / Freezer
+
+Add Food Access question (already partially in main.py) — keep options for “Good / Limited / Poor access”.
+
+Add Family Size field if not already visible here.
+
+Optional: Weekly Grocery Budget (keep existing dropdown).
+
+🚀 STEP 6 — Choose Your Plan
+
+Keep current design and pricing layout.
+
+Ensure all language uses “Flav.UR.Way Wellness Blueprint”.
+
+Optional upsell logic remains non-subscription (single purchase mode).
+
+⚙️ Backend Integration Notes
+
+Ensure main.py still receives:
+
+rainbow_preferences dict
+
+health_goals list
+
+dietary_restrictions list
+
+cuisines list + cuisines_other string
+
+lifestyle dict updated with new keys:
+
+snacking, kitchen_tools
+
+Validation: if user skips color or cuisine questions → friendly inline reminder.
+
+🧾 Deliverables
+
+Updated plan.html (or quiz.html) with all enhanced steps.
+
+Minor JS for validation + “Other” field toggles.
+
+Light CSS refinements:
+
+.color-count, .trust-ribbon, .fieldset-description spacing.
+
+Pill-style checkboxes for colors + cuisines.
+
+Confirm end-to-end data submission through FastAPI routes (no field loss).

@@ -125,6 +125,35 @@
             font-style: italic;
         }
         
+        .color-group {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+        .color-group.red { border-color: #fc8181; }
+        .color-group.orange { border-color: #f6ad55; }
+        .color-group.yellow { border-color: #f6e05e; }
+        .color-group.green { border-color: #68d391; }
+        .color-group.purple { border-color: #b794f4; }
+        .color-group.white { border-color: #cbd5e0; }
+        
+        .color-group h4 {
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+        
+        .color-count {
+            text-align: center;
+            padding: 12px;
+            background: #e6fffa;
+            border-radius: 8px;
+            color: #234e52;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
         .cuisine-table { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
@@ -137,6 +166,13 @@
             font-size: 1.1rem; 
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 8px;
+        }
+        
+        .dietary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
         }
         
         .button-group {
@@ -183,7 +219,6 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
         }
         .plan-option:hover {
             border-color: #667eea;
@@ -286,6 +321,9 @@
                     <option value="roommates">Roommates or friends</option>
                 </select>
                 
+                <label for="family_size">How many people in your household?</label>
+                <input type="number" id="family_size" name="family_size" placeholder="Number of people" min="1" max="20">
+                
                 <div id="breastfeedingField" class="conditional-field">
                     <label class="checkbox-label">
                         <input type="checkbox" name="special_conditions" value="breastfeeding">
@@ -309,27 +347,76 @@
                     Eating the rainbow means celebrating variety — the reds, greens, oranges, and purples that fuel your body and your joy. Choose the fruits and veggies you love most from each color group. If something's missing, tell us! We'll weave your favorites into your flavor plan.
                 </div>
                 
-                <label class="checkbox-label">
-                    <input type="checkbox" name="rainbow_colors" value="red"> 🔴 Red Foods (tomatoes, strawberries, red peppers)
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="rainbow_colors" value="orange"> 🟠 Orange Foods (carrots, sweet potatoes, oranges)
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="rainbow_colors" value="yellow"> 🟡 Yellow Foods (bananas, corn, yellow squash)
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="rainbow_colors" value="green"> 🟢 Green Foods (spinach, broccoli, avocados)
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="rainbow_colors" value="blue-purple"> 🟣 Blue/Purple Foods (blueberries, eggplant, purple cabbage)
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="rainbow_colors" value="white"> ⚪ White Foods (cauliflower, onions, garlic)
-                </label>
+                <div class="color-count" id="colorCount">Selected 0 colors</div>
+                
+                <!-- Red Foods -->
+                <div class="color-group red">
+                    <h4>🔴 Red Foods</h4>
+                    <label class="checkbox-label"><input type="checkbox" name="red_foods" value="tomatoes"> Tomatoes</label>
+                    <label class="checkbox-label"><input type="checkbox" name="red_foods" value="strawberries"> Strawberries</label>
+                    <label class="checkbox-label"><input type="checkbox" name="red_foods" value="red_peppers"> Red Bell Peppers</label>
+                    <label class="checkbox-label"><input type="checkbox" name="red_foods" value="beets"> Beets</label>
+                    <label class="checkbox-label"><input type="checkbox" name="red_foods" value="watermelon"> Watermelon</label>
+                    <input type="text" name="red_foods_other" placeholder="Other red favorites (comma-separated)">
+                </div>
+                
+                <!-- Orange Foods -->
+                <div class="color-group orange">
+                    <h4>🟠 Orange Foods</h4>
+                    <label class="checkbox-label"><input type="checkbox" name="orange_foods" value="carrots"> Carrots</label>
+                    <label class="checkbox-label"><input type="checkbox" name="orange_foods" value="sweet_potatoes"> Sweet Potatoes</label>
+                    <label class="checkbox-label"><input type="checkbox" name="orange_foods" value="oranges"> Oranges</label>
+                    <label class="checkbox-label"><input type="checkbox" name="orange_foods" value="butternut_squash"> Butternut Squash</label>
+                    <label class="checkbox-label"><input type="checkbox" name="orange_foods" value="papaya"> Papaya</label>
+                    <input type="text" name="orange_foods_other" placeholder="Other orange favorites (comma-separated)">
+                </div>
+                
+                <!-- Yellow Foods -->
+                <div class="color-group yellow">
+                    <h4>🟡 Yellow Foods</h4>
+                    <label class="checkbox-label"><input type="checkbox" name="yellow_foods" value="bananas"> Bananas</label>
+                    <label class="checkbox-label"><input type="checkbox" name="yellow_foods" value="corn"> Corn</label>
+                    <label class="checkbox-label"><input type="checkbox" name="yellow_foods" value="yellow_squash"> Yellow Squash</label>
+                    <label class="checkbox-label"><input type="checkbox" name="yellow_foods" value="pineapple"> Pineapple</label>
+                    <label class="checkbox-label"><input type="checkbox" name="yellow_foods" value="lemons"> Lemons</label>
+                    <input type="text" name="yellow_foods_other" placeholder="Other yellow favorites (comma-separated)">
+                </div>
+                
+                <!-- Green Foods -->
+                <div class="color-group green">
+                    <h4>🟢 Green Foods</h4>
+                    <label class="checkbox-label"><input type="checkbox" name="green_foods" value="spinach"> Spinach</label>
+                    <label class="checkbox-label"><input type="checkbox" name="green_foods" value="broccoli"> Broccoli</label>
+                    <label class="checkbox-label"><input type="checkbox" name="green_foods" value="avocados"> Avocados</label>
+                    <label class="checkbox-label"><input type="checkbox" name="green_foods" value="kale"> Kale</label>
+                    <label class="checkbox-label"><input type="checkbox" name="green_foods" value="green_beans"> Green Beans</label>
+                    <input type="text" name="green_foods_other" placeholder="Other green favorites (comma-separated)">
+                </div>
+                
+                <!-- Blue/Purple Foods -->
+                <div class="color-group purple">
+                    <h4>🟣 Blue/Purple Foods</h4>
+                    <label class="checkbox-label"><input type="checkbox" name="purple_foods" value="blueberries"> Blueberries</label>
+                    <label class="checkbox-label"><input type="checkbox" name="purple_foods" value="eggplant"> Eggplant</label>
+                    <label class="checkbox-label"><input type="checkbox" name="purple_foods" value="purple_cabbage"> Purple Cabbage</label>
+                    <label class="checkbox-label"><input type="checkbox" name="purple_foods" value="blackberries"> Blackberries</label>
+                    <label class="checkbox-label"><input type="checkbox" name="purple_foods" value="plums"> Plums</label>
+                    <input type="text" name="purple_foods_other" placeholder="Other blue/purple favorites (comma-separated)">
+                </div>
+                
+                <!-- White Foods -->
+                <div class="color-group white">
+                    <h4>⚪ White Foods</h4>
+                    <label class="checkbox-label"><input type="checkbox" name="white_foods" value="cauliflower"> Cauliflower</label>
+                    <label class="checkbox-label"><input type="checkbox" name="white_foods" value="onions"> Onions</label>
+                    <label class="checkbox-label"><input type="checkbox" name="white_foods" value="garlic"> Garlic</label>
+                    <label class="checkbox-label"><input type="checkbox" name="white_foods" value="mushrooms"> Mushrooms</label>
+                    <label class="checkbox-label"><input type="checkbox" name="white_foods" value="turnips"> Turnips</label>
+                    <input type="text" name="white_foods_other" placeholder="Other white favorites (comma-separated)">
+                </div>
                 
                 <div class="encouragement-footer">
-                    Each color brings its own nutrients and healing power — aim for all six daily!
+                    Aim for all six colors daily — each one adds its own nutrients and healing power!
                 </div>
                 
                 <div class="button-group">
@@ -361,17 +448,20 @@
                     <option value="diabetes_prevention">Diabetes Prevention</option>
                 </select>
                 
-                <label for="dietary_preference">Any Dietary Restrictions?</label>
-                <select id="dietary_preference" name="dietary_preference">
-                    <option value="">No Restrictions</option>
-                    <option value="vegetarian">Vegetarian</option>
-                    <option value="vegan">Vegan</option>
-                    <option value="gluten-free">Gluten-Free</option>
-                    <option value="dairy-free">Dairy-Free</option>
-                    <option value="low-carb">Low-Carb</option>
-                    <option value="halal">Halal</option>
-                    <option value="kosher">Kosher</option>
-                </select>
+                <label>Any Dietary Restrictions? (select all that apply)</label>
+                <div class="dietary-grid">
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="gluten-free"> Gluten-Free</label>
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="dairy-free"> Dairy-Free</label>
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="nut-free"> Nut-Free</label>
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="shellfish-free"> Shellfish-Free</label>
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="vegetarian"> Vegetarian</label>
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="vegan"> Vegan</label>
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="halal"> Halal</label>
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="kosher"> Kosher</label>
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="fasting"> Fasting (intermittent/religious)</label>
+                    <label class="checkbox-label"><input type="checkbox" name="dietary_restrictions" value="other" id="dietOther"> Other</label>
+                </div>
+                <input type="text" id="dietOtherText" name="dietary_restrictions_other" placeholder="Please specify other restrictions..." style="display: none;">
                 
                 <label class="checkbox-label">
                     <input type="checkbox" name="special_conditions" value="glp1"> Currently on GLP-1 medications (Ozempic, Wegovy, etc.)
@@ -442,9 +532,11 @@
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="French"> French</label>
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mediterranean"> Mediterranean</label>
                         <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Fusion"> Fusion / Modern Global</label>
-                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Other"> Other</label>
                     </div>
                 </div>
+                
+                <label for="cuisines_other">Other or Fusion Influences</label>
+                <textarea id="cuisines_other" name="cuisines_other" rows="2" placeholder="Tell us about other food traditions, regions, or dishes that inspire you..."></textarea>
                 
                 <label for="flavor_story">Share a story about a dish that means something to you (optional)</label>
                 <textarea id="flavor_story" name="flavor_story" rows="3" placeholder="The comfort food you crave, the celebration meal that brings everyone together, or the flavor that makes you smile..."></textarea>
@@ -490,13 +582,24 @@
                     <option value="high">⚡ High</option>
                 </select>
                 
-                <label>Do you have access to these cooking tools? (select all that apply)</label>
-                <label class="checkbox-label"><input type="checkbox" name="appliances" value="stove"> Stove</label>
-                <label class="checkbox-label"><input type="checkbox" name="appliances" value="oven"> Oven</label>
-                <label class="checkbox-label"><input type="checkbox" name="appliances" value="microwave"> Microwave</label>
-                <label class="checkbox-label"><input type="checkbox" name="appliances" value="air_fryer"> Air fryer</label>
-                <label class="checkbox-label"><input type="checkbox" name="appliances" value="blender"> Blender</label>
-                <label class="checkbox-label"><input type="checkbox" name="appliances" value="none"> None of the above</label>
+                <label for="snacking">How often do you snack between meals?</label>
+                <select id="snacking" name="snacking">
+                    <option value="">Select...</option>
+                    <option value="rarely">Rarely (I'm good until meals)</option>
+                    <option value="occasionally">Occasionally (1-2 times/day)</option>
+                    <option value="frequently">Frequently (3+ times/day)</option>
+                    <option value="constant">Constant grazer 😄</option>
+                </select>
+                
+                <label>Which tools do you have at home? (select all that apply)</label>
+                <div class="dietary-grid">
+                    <label class="checkbox-label"><input type="checkbox" name="kitchen_tools" value="stove"> Stove</label>
+                    <label class="checkbox-label"><input type="checkbox" name="kitchen_tools" value="oven"> Oven</label>
+                    <label class="checkbox-label"><input type="checkbox" name="kitchen_tools" value="microwave"> Microwave</label>
+                    <label class="checkbox-label"><input type="checkbox" name="kitchen_tools" value="air_fryer"> Air Fryer</label>
+                    <label class="checkbox-label"><input type="checkbox" name="kitchen_tools" value="blender"> Blender / Food Processor</label>
+                    <label class="checkbox-label"><input type="checkbox" name="kitchen_tools" value="fridge"> Refrigerator / Freezer</label>
+                </div>
                 
                 <label for="food_access">How often do you have access to fresh produce or groceries? *</label>
                 <select id="food_access" name="food_access" required>
@@ -630,6 +733,20 @@
             }
         }
 
+        // Update color count
+        function updateColorCount() {
+            const colorGroups = ['red_foods', 'orange_foods', 'yellow_foods', 'green_foods', 'purple_foods', 'white_foods'];
+            let selectedColors = 0;
+            colorGroups.forEach(group => {
+                const checkboxes = document.querySelectorAll(`input[name="${group}"]:checked`);
+                const otherText = document.querySelector(`input[name="${group}_other"]`)?.value;
+                if (checkboxes.length > 0 || (otherText && otherText.trim())) {
+                    selectedColors++;
+                }
+            });
+            document.getElementById('colorCount').textContent = `Selected ${selectedColors} colors`;
+        }
+
         // Show/hide breastfeeding field based on gender
         document.getElementById('gender').addEventListener('change', function() {
             const breastfeedingField = document.getElementById('breastfeedingField');
@@ -640,8 +757,26 @@
             }
         });
 
+        // Show/hide dietary restrictions "Other" text field
+        document.getElementById('dietOther').addEventListener('change', function() {
+            const otherText = document.getElementById('dietOtherText');
+            if (this.checked) {
+                otherText.style.display = 'block';
+            } else {
+                otherText.style.display = 'none';
+            }
+        });
+
+        // Update color count when checkboxes or text fields change
+        document.addEventListener('change', function(e) {
+            if (e.target.name && (e.target.name.includes('_foods') || e.target.name.includes('_foods_other'))) {
+                updateColorCount();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             showStep(currentStep);
+            updateColorCount();
         });
     </script>
 </body>

@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 import os
 from datetime import datetime
 import importlib.util
@@ -190,17 +190,36 @@ if HAS_MULTIPART:
         age: int = Form(...),
         gender: str = Form(...),
         who_eat_with: str = Form(...),
-        rainbow_colors: List[str] = Form([]),
+        family_size: str = Form(""),
+        # Rainbow foods by color
+        red_foods: List[str] = Form([]),
+        red_foods_other: str = Form(None),
+        orange_foods: List[str] = Form([]),
+        orange_foods_other: str = Form(None),
+        yellow_foods: List[str] = Form([]),
+        yellow_foods_other: str = Form(None),
+        green_foods: List[str] = Form([]),
+        green_foods_other: str = Form(None),
+        purple_foods: List[str] = Form([]),
+        purple_foods_other: str = Form(None),
+        white_foods: List[str] = Form([]),
+        white_foods_other: str = Form(None),
+        # Health goals
         health_goal: str = Form(...),
-        dietary_preference: str = Form(None),
+        dietary_restrictions: List[str] = Form([]),
+        dietary_restrictions_other: str = Form(None),
         special_conditions: List[str] = Form([]),
         feel_best: str = Form(None),
+        # Cuisines
         cuisines: List[str] = Form([]),
+        cuisines_other: str = Form(None),
         flavor_story: str = Form(None),
         reinvent_dish: str = Form(None),
+        # Lifestyle
         activity_level: str = Form(...),
         energy_levels: str = Form(None),
-        appliances: List[str] = Form([]),
+        snacking: str = Form(None),
+        kitchen_tools: List[str] = Form([]),
         food_access: str = Form(...),
         food_budget: str = Form(...),
         meals_per_day: str = Form(...),
@@ -212,6 +231,27 @@ if HAS_MULTIPART:
         try:
             logger.info(f"Quiz submitted: {{'name': '{name}', 'email': '{email}', 'plan_duration': {plan_duration}}}")
             
+            # Convert family_size from string to int (handle empty string)
+            family_size_int = int(family_size) if family_size and family_size.strip() else None
+            
+            # Build rainbow preferences dictionary
+            rainbow_preferences = {
+                "red": {"foods": red_foods, "other": red_foods_other},
+                "orange": {"foods": orange_foods, "other": orange_foods_other},
+                "yellow": {"foods": yellow_foods, "other": yellow_foods_other},
+                "green": {"foods": green_foods, "other": green_foods_other},
+                "purple": {"foods": purple_foods, "other": purple_foods_other},
+                "white": {"foods": white_foods, "other": white_foods_other}
+            }
+            
+            # Combine dietary restrictions
+            all_dietary_restrictions = dietary_restrictions.copy()
+            if dietary_restrictions_other:
+                all_dietary_restrictions.append(dietary_restrictions_other)
+            
+            # Combine cuisines
+            all_cuisines = cuisines.copy() if cuisines else ["Mediterranean"]
+            
             # Build user profile
             user_profile = {
                 "name": name,
@@ -219,17 +259,20 @@ if HAS_MULTIPART:
                 "age": age,
                 "gender": gender,
                 "who_eat_with": who_eat_with,
-                "rainbow_colors": rainbow_colors,
+                "family_size": family_size_int,
+                "rainbow_preferences": rainbow_preferences,
                 "health_goal": health_goal,
-                "dietary_preference": dietary_preference,
+                "dietary_restrictions": all_dietary_restrictions,
                 "special_conditions": special_conditions,
                 "feel_best": feel_best,
-                "cuisines": cuisines if cuisines else ["Mediterranean"],
+                "cuisines": all_cuisines,
+                "cuisines_other": cuisines_other,
                 "flavor_story": flavor_story,
                 "reinvent_dish": reinvent_dish,
                 "activity_level": activity_level,
                 "energy_levels": energy_levels,
-                "appliances": appliances,
+                "snacking": snacking,
+                "kitchen_tools": kitchen_tools,
                 "food_access": food_access,
                 "food_budget": food_budget,
                 "meals_per_day": meals_per_day,
