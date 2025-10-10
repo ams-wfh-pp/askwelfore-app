@@ -1,394 +1,44 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from typing import List, Dict, Any
-from datetime import datetime
-import json
-import random
+from typing import Dict, Any
 import os
+from datetime import datetime
 
 from logger_utils import logger, purge_old_logs
 from ghl_integration import lookup_contact, has_freemium_tag, add_tag_to_contact, create_contact
 from email_service import send_admin_notification, get_free_plan_email, get_upsell_email, send_email
-
-# ===== Meal Planning Functions =====
-
-def generate_enhanced_meal_plan(user_profile):
-    """Generate a comprehensive culturally sensitive meal plan with rainbow preferences and 5-color tracking"""
-    
-    days = user_profile["plan_duration"]
-    health_goals = user_profile["health_goals"]
-    dietary_restrictions = user_profile["dietary_restrictions"]
-    cuisines = user_profile.get("cuisines", [])
-    if not cuisines:
-        cuisines = user_profile.get("cultural_heritage", [])
-    
-    regional_identity = user_profile.get("regional_identity", "")
-    activity_level = user_profile["lifestyle"]["activity_level"]
-    breastfeeding = user_profile["breastfeeding"]
-    food_catalog = user_profile.get("food_catalog", [])
-    rainbow_preferences = user_profile["rainbow_preferences"]
-
-    preferred_foods = []
-    for color_group in rainbow_preferences.values():
-        preferred_foods.extend(color_group)
-
-    available_foods = []
-    for food in food_catalog:
-        if "vegetarian" in dietary_restrictions and food.get("type") == "protein" and food.get("name") not in [
-                "Greek Yogurt", "Black Beans", "Lentils", "Tofu", "Pinto Beans", "Eggs"
-        ]:
-            continue
-        if "vegan" in dietary_restrictions and ("dairy" in food.get("allergens", []) or food.get("type") == "dairy" or
-                                                "eggs" in food.get("allergens", [])):
-            continue
-        if "gluten" in dietary_restrictions and "gluten" in food.get("allergens", []):
-            continue
-        if "dairy" in dietary_restrictions and "dairy" in food.get("allergens", []):
-            continue
-        if "nuts" in dietary_restrictions and "nuts" in food.get("allergens", []):
-            continue
-
-        if health_goals and any(goal in food.get("goal_tags", []) for goal in health_goals):
-            available_foods.append(food)
-        elif not health_goals:
-            available_foods.append(food)
-
-    if not available_foods:
-        available_foods = [
-            {"name": "Mixed vegetables", "type": "vegetable", "color": "green", "fiber_g": 3.0},
-            {"name": "Brown rice", "type": "carbohydrate", "color": "brown", "fiber_g": 2.0},
-            {"name": "Chicken breast", "type": "protein", "color": "white", "fiber_g": 0},
-            {"name": "Apple", "type": "fruit", "color": "red", "fiber_g": 2.4},
-            {"name": "Greek yogurt", "type": "dairy", "color": "white", "fiber_g": 0},
-        ]
-
-    proteins = [f for f in available_foods if f.get("type") == "protein"] or [{"name": "Chicken breast", "type": "protein", "color": "white", "fiber_g": 0}]
-    vegetables = [f for f in available_foods if f.get("type") == "vegetable"] or [{"name": "Mixed greens", "type": "vegetable", "color": "green", "fiber_g": 2.0}]
-    carbs = [f for f in available_foods if f.get("type") == "carbohydrate"] or [{"name": "Brown rice", "type": "carbohydrate", "color": "brown", "fiber_g": 1.8}]
-    fruits = [f for f in available_foods if f.get("type") == "fruit"] or [{"name": "Apple", "type": "fruit", "color": "red", "fiber_g": 2.4}]
-    dairy = [f for f in available_foods if f.get("type") == "dairy"] or [{"name": "Greek yogurt", "type": "dairy", "color": "white", "fiber_g": 0}]
-
-    meal_plan = {
-        "days": days,
-        "profile": {
-            "condition": f"{', '.join(health_goals).title()} goals for {user_profile['name']}, Age {user_profile['age']}",
-            "cuisines": cuisines if cuisines else ["Global Fusion"],
-            "regional_identity": regional_identity,
-            "dietary_restrictions": dietary_restrictions,
-            "activity_level": activity_level.replace('_', ' ').title(),
-            "breastfeeding": breastfeeding,
-        },
-        "plan": [],
-        "daily_summaries": [],
-        "rainbow_focus": True
-    }
-
-    for day in range(days):
-        daily_colors = set()
-        daily_fiber = 0
-
-        breakfast_fruit = random.choice(fruits)
-        breakfast_dairy = random.choice(dairy) if dairy else None
-        breakfast_carb = random.choice(carbs)
-
-        if breakfast_dairy:
-            breakfast_name = f"{breakfast_fruit['name']} parfait with {breakfast_dairy['name']} and {breakfast_carb['name']}"
-            daily_colors.update([breakfast_fruit["color"], breakfast_dairy["color"], breakfast_carb["color"]])
-            daily_fiber += breakfast_fruit["fiber_g"] + breakfast_dairy["fiber_g"] + breakfast_carb["fiber_g"]
-        else:
-            breakfast_name = f"{breakfast_fruit['name']} smoothie bowl with {breakfast_carb['name']}"
-            daily_colors.update([breakfast_fruit["color"], breakfast_carb["color"]])
-            daily_fiber += breakfast_fruit["fiber_g"] + breakfast_carb["fiber_g"]
-
-        lunch_protein = random.choice(proteins)
-        lunch_veg = random.choice(vegetables)
-        lunch_carb = random.choice(carbs)
-
-        lunch_name = f"{lunch_protein['name']} with {lunch_veg['name']} and {lunch_carb['name']}"
-        daily_colors.update([lunch_protein["color"], lunch_veg["color"], lunch_carb["color"]])
-        daily_fiber += lunch_protein["fiber_g"] + lunch_veg["fiber_g"] + lunch_carb["fiber_g"]
-
-        dinner_protein = random.choice([p for p in proteins if p != lunch_protein]) if len(proteins) > 1 else lunch_protein
-        dinner_veg = random.choice([v for v in vegetables if v != lunch_veg]) if len(vegetables) > 1 else lunch_veg
-
-        dinner_name = f"Herb-seasoned {dinner_protein['name']} with roasted {dinner_veg['name']}"
-        daily_colors.update([dinner_protein["color"], dinner_veg["color"]])
-        daily_fiber += dinner_protein["fiber_g"] + dinner_veg["fiber_g"]
-
-        has_nut_allergy = any("nut" in restriction.lower() for restriction in dietary_restrictions)
-        
-        if has_nut_allergy:
-            morning_snack = {"name": f"{random.choice(fruits)['name']} with yogurt", "colors": ["red", "white"]}
-        else:
-            morning_snack = {"name": f"{random.choice(fruits)['name']} with nuts", "colors": ["red", "brown"]}
-        afternoon_snack = {"name": f"{random.choice(vegetables)['name']} with hummus", "colors": ["green", "beige"]}
-
-        daily_colors.update(morning_snack["colors"])
-        daily_colors.update(afternoon_snack["colors"])
-
-        hydration_tips = [
-            "💧 Start your day with a large glass of water!",
-            "💧 Try adding lemon to your water for flavor!",
-            "💧 Keep a water bottle nearby as a reminder!",
-            "💧 Herbal teas count toward your daily water intake!"
-        ]
-        hydration_tip = random.choice(hydration_tips)
-        if breastfeeding == "yes":
-            hydration_tip += " 🤱 As a breastfeeding mom, aim for extra water!"
-
-        day_meals = {
-            "breakfast": {"name": breakfast_name},
-            "morning_snack": {"name": morning_snack["name"], "colors": morning_snack["colors"]},
-            "lunch": {"name": lunch_name},
-            "afternoon_snack": {"name": afternoon_snack["name"], "colors": afternoon_snack["colors"]},
-            "dinner": {"name": dinner_name},
-            "hydration_tip": hydration_tip
-        }
-
-        daily_summary = {
-            "colors": len(daily_colors),
-            "color_list": list(daily_colors),
-            "fiber_g": round(daily_fiber, 1)
-        }
-
-        meal_plan["plan"].append(day_meals)
-        meal_plan["daily_summaries"].append(daily_summary)
-
-    return meal_plan
-
-
-def get_enhanced_recommended_pdfs(user_profile):
-    """Enhanced PDF matching with comprehensive health guide selection"""
-    
-    recommended = []
-    lifestyle = user_profile["lifestyle"]
-    health_goals = user_profile["health_goals"]
-
-    if "heart_health" in health_goals:
-        recommended.append({
-            "title": "Happy Hearts Guide",
-            "description": "Heart-healthy lifestyle and nutrition tips",
-            "filename": "happy_hearts.pdf",
-            "reason": "Heart health goal"
-        })
-
-    if "diabetes_management" in health_goals:
-        recommended.append({
-            "title": "Blood Sugar Control Guide",
-            "description": "Managing blood sugar through diet and lifestyle",
-            "filename": "blood_sugar_control.pdf",
-            "reason": "Diabetes management goal"
-        })
-        recommended.append({
-            "title": "Type 2 Diabetes Management",
-            "description": "Comprehensive diabetes lifestyle management",
-            "filename": "type2_diabetes.pdf",
-            "reason": "Type 2 Diabetes management"
-        })
-
-    if lifestyle.get("sleep_stress") in ["poor", "fair"]:
-        recommended.append({
-            "title": "General Health & Wellness Guide",
-            "description": "Comprehensive wellness strategies for better health",
-            "filename": "general_health.pdf",
-            "reason": "Sleep and stress concerns"
-        })
-
-    if "liver_support" in health_goals or lifestyle.get("hydration_habits") == "low":
-        recommended.append({
-            "title": "Liver Health Guide",
-            "description": "Supporting liver function through nutrition and hydration",
-            "filename": "liver_health.pdf",
-            "reason": "Liver support goal or low hydration"
-        })
-
-    if "glp1_support" in health_goals:
-        recommended.append({
-            "title": "GLP-1 Patient Support Guide",
-            "description": "Specialized nutrition and lifestyle guidance for GLP-1 medication users",
-            "filename": "glp1_patient_support.pdf",
-            "reason": "GLP-1 patient support goal"
-        })
-
-    if not recommended:
-        recommended.append({
-            "title": "General Health & Wellness Guide",
-            "description": "Foundational wellness strategies for everyone",
-            "filename": "general_health.pdf",
-            "reason": "Foundational wellness support"
-        })
-
-    seen = set()
-    unique_recommended = []
-    for item in recommended:
-        if item["filename"] not in seen:
-            seen.add(item["filename"])
-            unique_recommended.append(item)
-
-    return unique_recommended
-
-
-# ===== FastAPI App Setup =====
 
 app = FastAPI()
 
 STRIPE_7DAY_LINK = os.getenv('STRIPE_7DAY_LINK', "https://buy.stripe.com/5kQ7sMddybXy8dsfUR7Vm0a")
 STRIPE_14DAY_LINK = os.getenv('STRIPE_14DAY_LINK', "https://buy.stripe.com/14A28s7Te3r251gcIF7Vm0b")
 
-try:
-    app.mount("/static", StaticFiles(directory="static"), name="static")
-except:
-    logger.warning("Static directory not found - static files disabled")
-
-templates = Jinja2Templates(directory="templates")
-
-try:
-    with open("cultural_food_catalog_expanded.json", "r", encoding="utf-8") as f:
-        food_catalog = json.load(f).get("foods", [])
-except FileNotFoundError:
-    logger.warning("Food catalog not found - using empty catalog")
-    food_catalog = []
-
-food_options = {
-    "red": ["Tomatoes", "Red Bell Peppers", "Strawberries", "Cherries", "Red Beans", "Watermelon", "Red Onions", "Pomegranate"],
-    "orange": ["Carrots", "Sweet Potatoes", "Oranges", "Mangoes", "Papaya", "Cantaloupe", "Orange Bell Peppers", "Butternut Squash"],
-    "yellow": ["Corn", "Yellow Squash", "Pineapple", "Bananas", "Yellow Bell Peppers", "Golden Beets", "Yellow Tomatoes", "Lemons"],
-    "green": ["Spinach", "Broccoli", "Green Peas", "Kale", "Cucumber", "Green Beans", "Avocado", "Brussels Sprouts", "Cilantro", "Collard Greens"],
-    "purple": ["Eggplant", "Blackberries", "Purple Cabbage", "Grapes", "Blueberries", "Purple Sweet Potatoes", "Red Onions", "Plums"],
-    "white": ["Cauliflower", "Mushrooms", "Garlic", "Onions", "White Beans", "Turnips", "Jicama", "White Fish", "Tofu"]
-}
-
 @app.on_event("startup")
 async def startup_event():
     purge_old_logs()
-    logger.info("WelFore Health App started - Quiz & Freemium endpoints active")
-
-
-# ===== ORIGINAL QUIZ ENDPOINTS =====
+    logger.info("WelFore Health App started")
 
 @app.get("/", response_class=HTMLResponse)
-async def show_quiz(request: Request):
-    """Original quiz form endpoint"""
-    logger.info("Quiz form accessed")
-    return templates.TemplateResponse("plan.html", {
-        "request": request,
-        "food_options": food_options
-    })
-
-
-@app.post("/", response_class=HTMLResponse)
-async def handle_quiz(
-    request: Request,
-    name: str = Form(...),
-    age: int = Form(...),
-    gender: str = Form(...),
-    breastfeeding: str = Form("no"),
-    family_size: int = Form(1),
-    red_foods: List[str] = Form([]),
-    red_foods_other: str = Form(""),
-    orange_foods: List[str] = Form([]),
-    orange_foods_other: str = Form(""),
-    yellow_foods: List[str] = Form([]),
-    yellow_foods_other: str = Form(""),
-    green_foods: List[str] = Form([]),
-    green_foods_other: str = Form(""),
-    purple_foods: List[str] = Form([]),
-    purple_foods_other: str = Form(""),
-    white_foods: List[str] = Form([]),
-    white_foods_other: str = Form(""),
-    health_goals: List[str] = Form([]),
-    dietary_restrictions: str = Form(""),
-    cuisines: List[str] = Form([]),
-    cuisines_other: str = Form(""),
-    regional_identity: str = Form(""),
-    activity_level: str = Form(...),
-    hydration_habits: str = Form(...),
-    sleep_stress: str = Form(...),
-    cooking_confidence: str = Form(...),
-    fruit_veggie_intake: str = Form(...),
-    meal_skipping: str = Form(...),
-    fast_food: str = Form(...),
-    food_access: str = Form(...),
-    grocery_budget: str = Form(...),
-    plan_duration: int = Form(...),
-):
-    """Original quiz processing endpoint"""
-    logger.info(f"Quiz submitted for user: {name}, age: {age}, plan: {plan_duration} days")
-    
-    def parse_other_foods(other_string):
-        return [item.strip() for item in other_string.split(",") if item.strip()]
-
-    user_profile = {
-        "name": name,
-        "age": age,
-        "gender": gender,
-        "breastfeeding": breastfeeding,
-        "family_size": family_size,
-        "rainbow_preferences": {
-            "red_foods": red_foods + parse_other_foods(red_foods_other),
-            "orange_foods": orange_foods + parse_other_foods(orange_foods_other),
-            "yellow_foods": yellow_foods + parse_other_foods(yellow_foods_other),
-            "green_foods": green_foods + parse_other_foods(green_foods_other),
-            "purple_foods": purple_foods + parse_other_foods(purple_foods_other),
-            "white_foods": white_foods + parse_other_foods(white_foods_other),
-        },
-        "health_goals": health_goals,
-        "dietary_restrictions": [d.strip() for d in dietary_restrictions.split(",") if d.strip()],
-        "cuisines": cuisines + ([cuisines_other] if cuisines_other.strip() else []),
-        "cultural_heritage": cuisines + ([cuisines_other] if cuisines_other.strip() else []),
-        "regional_identity": regional_identity,
-        "lifestyle": {
-            "activity_level": activity_level,
-            "hydration_habits": hydration_habits,
-            "sleep_stress": sleep_stress,
-            "cooking_confidence": cooking_confidence,
-            "fruit_veggie_intake": fruit_veggie_intake,
-            "meal_skipping": meal_skipping,
-            "fast_food": fast_food,
-            "food_access": food_access,
-            "grocery_budget": grocery_budget
-        },
-        "plan_duration": plan_duration,
-        "food_catalog": food_catalog
-    }
-
-    plan = generate_enhanced_meal_plan(user_profile)
-    is_premium = plan_duration > 3
-    if is_premium:
-        plan["is_premium"] = True
-        plan["free_days"] = 3
-        plan["premium_message"] = f"✨ Unlock your full {plan_duration}-day plan with WelFore Premium!"
-    else:
-        plan["is_premium"] = False
-
-    recommended_pdfs = get_enhanced_recommended_pdfs(user_profile)
-
-    logger.info(f"Meal plan generated: {plan_duration} days, premium: {is_premium}")
-    
-    return templates.TemplateResponse("plan.html", {
-        "request": request,
-        "food_options": food_options,
-        "plan": plan,
-        "user_profile": user_profile,
-        "recommended_pdfs": recommended_pdfs,
-        "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p"),
-        "result": {
-            "name": name,
-            "message": f"Your personalized {plan['days']}-day meal plan has been generated!"
-        }
-    })
-
-
-# ===== FREEMIUM WEBHOOK ENDPOINT =====
+async def read_root():
+    return """
+    <html>
+    <head><title>WelFore Health</title></head>
+    <body>
+        <h1>Welcome to the WelFore Nutrition App</h1>
+        <p>Freemium Lock + Upsell Logic Active</p>
+        <ul>
+            <li>Free 3-Day Meal Plan (One-Time Only)</li>
+            <li>7-Day & 14-Day Premium Plans Available</li>
+        </ul>
+    </body>
+    </html>
+    """
 
 @app.post("/webhook/quiz")
 async def quiz_webhook(request: Request):
-    """Freemium lock webhook - enforces one-time free plan with GHL tagging"""
     try:
         payload = await request.json()
-        logger.info(f"Freemium webhook received: {payload}")
+        logger.info(f"Received quiz webhook: {payload}")
         
         email = payload.get('email')
         name = payload.get('name', '')
@@ -459,81 +109,18 @@ async def quiz_webhook(request: Request):
             )
         
     except Exception as e:
-        logger.error(f"Error processing freemium webhook: {str(e)}")
+        logger.error(f"Error processing webhook: {str(e)}")
         return JSONResponse(
             status_code=500,
             content={"status": "error", "message": "Internal server error"}
         )
-
-
-# ===== GHL WEBHOOK ENDPOINT (for incoming GHL data) =====
-
-@app.post("/ghl/webhook")
-async def ghl_webhook(request: Request):
-    """Receives data FROM GoHighLevel"""
-    try:
-        payload = await request.json()
-        logger.info(f"GHL webhook received: {payload}")
-        
-        # Process GHL webhook data here
-        # This could be contact updates, form submissions, etc.
-        
-        return JSONResponse(
-            content={"status": "received", "message": "GHL webhook processed"}
-        )
-    except Exception as e:
-        logger.error(f"Error processing GHL webhook: {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={"status": "error", "message": "Internal server error"}
-        )
-
-
-# ===== UTILITY ENDPOINTS =====
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
-
 
 @app.post("/test/webhook")
 async def test_webhook(request: Request):
-    """Test endpoint for webhook validation"""
     payload = await request.json()
     logger.info(f"Test webhook received: {payload}")
     return {"status": "test_received", "payload": payload}
-
-
-# ===== PREMIUM SUCCESS PAGES (for Stripe callbacks) =====
-
-@app.get("/premium/7day/success", response_class=HTMLResponse)
-async def premium_7day_success(request: Request):
-    """7-day premium plan success page"""
-    logger.info("7-day premium purchase completed")
-    return """
-    <html>
-    <head><title>Welcome to WelFore Premium!</title></head>
-    <body>
-        <h1>🎉 Welcome to Your 7-Day Premium Plan!</h1>
-        <p>Your personalized 7-day meal plan is being prepared.</p>
-        <p>Check your email for your complete plan and next steps!</p>
-    </body>
-    </html>
-    """
-
-
-@app.get("/premium/14day/success", response_class=HTMLResponse)
-async def premium_14day_success(request: Request):
-    """14-day premium plan success page"""
-    logger.info("14-day premium purchase completed")
-    return """
-    <html>
-    <head><title>Welcome to WelFore Premium!</title></head>
-    <body>
-        <h1>🎉 Welcome to Your 14-Day Premium Plan!</h1>
-        <p>Your personalized 14-day meal plan is being prepared.</p>
-        <p>Check your email for your complete plan and next steps!</p>
-    </body>
-    </html>
-    """
