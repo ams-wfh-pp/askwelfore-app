@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AskWelFore | Personalized Wellness Quiz</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .award-banner { text-align: center; margin-bottom: 25px; }
+        .award-banner img { max-width: 220px; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2)); }
+        .award-caption { font-size: 0.95rem; color: #4a5568; font-weight: 600; margin-top: 8px; }
+        .intro h1 { color: #2d3748; font-size: 1.8rem; margin-bottom: 15px; text-align: center; }
+        .intro p { text-align: center; color: #4a5568; max-width: 650px; margin: auto; line-height: 1.6; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(102,126,234,0.15); border-radius: 4px; margin: 25px 0; }
+        .progress { height: 100%; background: linear-gradient(135deg,#667eea,#764ba2); border-radius: 4px; width: 0%; transition: width 0.4s ease; }
+        .question { display: none; margin-top: 20px; }
+        .question.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .question h2 { color: #2d3748; font-size: 1.4rem; margin-bottom: 20px; }
+        input[type="text"], select, textarea { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; margin-bottom: 15px; transition: border-color 0.3s; }
+        input[type="text"]:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
+        button { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102,126,234,0.4); }
+        .cuisine-table { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .cuisine-column h4 { color: #667eea; margin-bottom: 10px; font-size: 1rem; }
+        .checkbox-label { display: block; margin-bottom: 8px; cursor: pointer; color: #4a5568; }
+        .checkbox-label input { margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 🏆 Global Recognition Banner -->
+        <div class="award-banner">
+            <img src="/static/WELFORE.png" alt="Digital Health Hub Rising Star Finalist 2025 - WelFore Health">
+            <p class="award-caption">🏆 Recognized Globally for Innovation in Wellness & Prevention</p>
+        </div>
+
+        <!-- 🌟 Intro -->
+        <div class="intro">
+            <h1>Welcome to the AskWelFore Wellness Reset</h1>
+            <p>Let's personalize your Flavor-First, Family-Centered path to better health. This guided quiz helps us match your favorite cuisines and goals to a plan designed with bold flavor and balanced nutrition in mind.</p>
+        </div>
+
+        <!-- 📊 Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+
+        <!-- 🌈 Sequential Questionnaire -->
+        <form id="quizForm" method="POST" action="/submit">
+            <div class="question active">
+                <h2>1️⃣ What's your name?</h2>
+                <input type="text" name="name" placeholder="Enter your name" required>
+                <button type="button" onclick="nextQuestion()">Next</button>
+            </div>
+
+            <div class="question">
+                <h2>2️⃣ What's your top health goal?</h2>
+                <select name="goal" required>
+                    <option value="">Select one...</option>
+                    <option value="weight">Weight Management</option>
+                    <option value="blood_pressure">Lower Blood Pressure</option>
+                    <option value="blood_sugar">Stabilize Blood Sugar</option>
+                    <option value="energy">Increase Energy</option>
+                    <option value="digestive">Improve Gut Health</option>
+                </select>
+                <button type="button" onclick="nextQuestion()">Next</button>
+            </div>
+
+            <div class="question">
+                <h2>3️⃣ Which cuisines make you happiest?</h2>
+                <div class="cuisine-table">
+                    <div class="cuisine-column">
+                        <h4>🌍 Global Classics</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Italian"> Italian</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Mexican"> Mexican</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Asian"> Asian</label>
+                    </div>
+                    <div class="cuisine-column">
+                        <h4>🌴 Island & Coastal</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Caribbean"> Caribbean</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Creole"> Creole</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Mediterranean"> Mediterranean</label>
+                    </div>
+                    <div class="cuisine-column">
+                        <h4>🥗 Plant-Rich & Modern</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Vegetarian"> Vegetarian</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Fusion"> Fusion</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisine" value="Other"> Other</label>
+                    </div>
+                </div>
+                <button type="button" onclick="nextQuestion()">Next</button>
+            </div>
+
+            <div class="question">
+                <h2>4️⃣ How many meals do you typically eat per day?</h2>
+                <select name="meals_per_day" required>
+                    <option value="">Select one...</option>
+                    <option value="2">2 Meals</option>
+                    <option value="3">3 Meals</option>
+                    <option value="4">4 Meals</option>
+                    <option value="5+">5+ Meals</option>
+                </select>
+                <button type="button" onclick="nextQuestion()">Next</button>
+            </div>
+
+            <div class="question">
+                <h2>5️⃣ What's your biggest challenge with healthy eating?</h2>
+                <textarea name="challenge" rows="4" placeholder="Example: time, taste, cost, variety..." required></textarea>
+                <button type="submit">Get My Personalized Plan</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let current = 0;
+        const questions = document.querySelectorAll('.question');
+        const progress = document.querySelector('.progress');
+
+        function showQuestion(index) {
+            questions.forEach((q, i) => {
+                q.classList.toggle('active', i === index);
+                q.style.display = i === index ? 'block' : 'none';
+            });
+            progress.style.width = `${(index / (questions.length - 1)) * 100}%`;
+        }
+
+        function nextQuestion() {
+            if (current < questions.length - 1) {
+                current++;
+                showQuestion(current);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => showQuestion(current));
+    </script>
+</body>
+</html>
