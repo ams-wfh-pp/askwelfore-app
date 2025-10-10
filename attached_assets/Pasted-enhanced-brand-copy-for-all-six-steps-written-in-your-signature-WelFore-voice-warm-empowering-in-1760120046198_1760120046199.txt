@@ -1,0 +1,156 @@
+enhanced brand copy for all six steps, written in your signature WelFore voice:
+warm, empowering, inclusive, and flavor-first.
+
+🟣 Step 1 — Tell Us About You
+
+Headline:
+👋 Let’s Get to Know You
+
+Description:
+We believe wellness starts with understanding you — your family, your lifestyle, and your goals.
+Tell us a little about who’s around your table and how you live day to day.
+Every answer helps us tailor a plan that fits your real life, not someone else’s.
+
+Tone cues: curious, personal, conversational
+Optional sub-prompt: “Who do you usually cook or eat with? Food tastes better when shared.”
+
+🌈 Step 2 — Eat the Rainbow
+
+Headline:
+🌈 What Colors Brighten Your Plate?
+
+Description:
+Eating the rainbow means celebrating variety — the reds, greens, oranges, and purples that fuel your body and your joy.
+Choose the fruits and veggies you love most from each color group.
+If something’s missing, tell us! We’ll weave your favorites into your flavor plan.
+
+Encouragement footer:
+“Each color brings its own nutrients and healing power — aim for all six daily!”
+
+💪 Step 3 — Your Wellness Goals
+
+Headline:
+💪 What Does “Feeling Your Best” Mean to You?
+
+Description:
+Wellness looks different for everyone. Some want more energy, others need balance or recovery.
+Select the health goals that matter most to you, and we’ll build your plan around them —
+whether it’s supporting your heart, balancing blood sugar, or keeping your glow strong.
+
+Encouragement footer:
+“Your goals guide your plate — every bite should move you closer to feeling amazing.”
+
+🍽️ Step 4 — Cuisines, Culture & Comfort
+
+Headline:
+🍽️ What Flavors Feel Like Home?
+
+Description:
+Food is more than fuel — it’s family, memory, and identity.
+Select the cuisines that bring you joy or reflect your heritage.
+Then share a story about a dish that means something to you — the comfort food you crave,
+the celebration meal that brings everyone together, or the flavor that makes you smile.
+
+Encouragement footer:
+“Your culture isn’t a restriction — it’s the flavor foundation of your wellness journey.”
+
+🏡 Step 5 — Lifestyle & Habits
+
+Headline:
+🏡 Let’s Make It Work for Your Life
+
+Description:
+Healthy living isn’t one-size-fits-all — it’s about meeting you where you are.
+Tell us how you move, cook, shop, and manage your day.
+We’ll design a realistic plan that fits your time, budget, and kitchen setup —
+because flavor and balance should never depend on perfect conditions.
+
+Encouragement footer:
+“Your plan should flex around your life — not the other way around.”
+
+🚀 Step 6 — Choose Your Plan
+
+Headline:
+🚀 You’re Almost There!
+
+Description:
+You’ve personalized your FlavURWay Wellness Blueprint — now let’s unlock your plan.
+Start with a free 3-day taste test or go all in for 7 or 14 days of recipes, shopping lists,
+and practical flavor coaching.
+
+Encouragement footer:
+“Great job! You’ve built something that’s as unique as you are. Let’s bring your flavor-first reset to life.”
+
+💡 Optional Closing Microcopy (after submission)
+
+Message while generating plan:
+✨ “Your flavor-first meal plan is being prepared! We’re mixing colors, goals, and heritage to design something that’s authentically you…”
+
+Success confirmation:
+✅ “All set! Your personalized plan is ready. Get ready to eat boldly, live balanced, and love your plate again.”
+
+Would you like me to add a “trust + credibility ribbon” (e.g.,
+
+“Backed by 10+ years of research and an ADA-funded clinical study”)
+to appear subtly on every step’s footer or only on the final screen?
+
+You said:
+that would be nice
+ChatGPT said:
+
+Beautiful — that’s exactly the kind of quiet authority that makes the experience feel credible and reassuring without breaking the warm, conversational tone.
+
+Here’s the recommended trust ribbon implementation and copy styling for your Replit agent to include 👇
+
+🏅 Trust & Credibility Ribbon — Implementation Notes
+🎯 Purpose:
+
+Subtle, ever-present reassurance that this isn’t just another diet quiz —
+it’s a science-backed, culturally grounded system with real results.
+
+💬 Suggested Placement:
+
+Fixed footer banner (centered, 90% width) that gently fades in at the bottom of every step.
+
+Light gray text, small font (0.85em), italicized for warmth.
+
+Optional mini “🏅” or “🔬” emoji for credibility with personality.
+
+🧩 Copy Options:
+Option A (Full Statement – for desktop/tablet):
+
+🏅 Backed by 10+ years of research and real-world results — including an ADA-funded clinical study with Eastern Virginia Medical School.
+
+Option B (Condensed – for mobile):
+
+🔬 Clinically evaluated & trusted by 500,000+ families.
+
+Option C (Final Step / Results Page Emphasis):
+
+🌿 The FlavURWay System — Recognized globally for innovation in Wellness & Prevention (Digital Health Hub Finalist, 2025).
+
+🎨 Styling Notes for CSS:
+.trust-ribbon {
+  text-align: center;
+  font-size: 0.85em;
+  color: #4a5568;
+  font-style: italic;
+  margin-top: 30px;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.trust-ribbon:hover {
+  opacity: 1;
+  color: #2d3748;
+}
+
+✅ Integration Guidance for Replit Agent:
+
+Add this <div class="trust-ribbon"> element below the navigation buttons on every step (inside each template block).
+
+Swap the copy dynamically:
+
+Steps 1–5 → use Option A or B depending on screen size.
+
+Step 6 (final screen) → use Option C for recognition / credibility closeout.

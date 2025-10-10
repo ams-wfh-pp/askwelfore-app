@@ -10,10 +10,63 @@ import importlib.util
 # Import logger utilities (no external dependencies)
 from logger_utils import logger, purge_old_logs
 
+# Import master engine for meal plan generation
+try:
+    from master_engine import generate_enhanced_meal_plan, get_enhanced_recommended_pdfs, calculate_nutrition_score
+    HAS_MASTER_ENGINE = True
+    print("✅ Master Engine loaded successfully")
+except Exception as e:
+    print(f"⚠️ Warning: Could not load master_engine: {e}")
+    HAS_MASTER_ENGINE = False
+
 # Defer imports that require external packages until after safety checks
 # These will be imported conditionally based on package availability
 ghl_integration = None
 email_service = None
+
+# ---- STARTUP LOG BANNER ----
+from datetime import datetime
+
+APP_NAME = "AskWelFore App"
+APP_VERSION = "v1.1 – Global Finalist Edition"
+APP_ORG = "WelFore Health"
+APP_TAGLINE = "Flavor-Full Food-as-Medicine Wellness Starts Here"
+
+startup_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+print("\n" + "="*70)
+print(f"🚀  {APP_NAME} | {APP_VERSION}")
+print(f"🏆  {APP_ORG} — Digital Health Hub Global Finalist (Wellness & Prevention 2025)")
+print(f"✨  {APP_TAGLINE}")
+print(f"🕒  Launched at: {startup_time}")
+print("="*70 + "\n")
+# ---- END STARTUP LOG BANNER ----
+
+# ---- Dependency Diagnostic Check (Auto-run on startup) ----
+import importlib
+
+required_packages = [
+    "fastapi",
+    "uvicorn",
+    "jinja2",
+    "requests",
+    "python-multipart",
+    "python-dateutil",
+    "pydantic",
+    "aiofiles"
+]
+
+missing = []
+for pkg in required_packages:
+    if importlib.util.find_spec(pkg) is None:
+        missing.append(pkg)
+
+if missing:
+    print(f"⚠️  Warning: Missing packages detected — {', '.join(missing)}")
+    print("   The app will continue running, but please reinstall the missing dependencies.")
+else:
+    print("✅ All core dependencies verified and ready to go.")
+# ---- End Diagnostic ----
 
 # ---- SAFETY PATCH START ----
 # Check for required packages and warn if missing (prevents crashes)
@@ -101,7 +154,7 @@ async def startup_event():
 
 @app.get("/", response_class=HTMLResponse)
 async def show_quiz(request: Request):
-    """Serve the sequential questionnaire quiz page"""
+    """Serve the 6-step Eat-the-Rainbow questionnaire"""
     if not HAS_MULTIPART:
         # If multipart is missing, show a message
         return HTMLResponse(content=f"""
@@ -125,7 +178,7 @@ async def show_quiz(request: Request):
         </body>
         </html>
         """, status_code=200)
-    return templates.TemplateResponse("quiz.html", {"request": request})
+    return templates.TemplateResponse("plan.html", {"request": request})
 
 # Only register form submission endpoint if multipart is available
 if HAS_MULTIPART:
@@ -133,35 +186,100 @@ if HAS_MULTIPART:
     async def submit_quiz(
         request: Request,
         name: str = Form(...),
-        goal: str = Form(...),
-        cuisine: List[str] = Form([]),
+        email: str = Form(...),
+        age: int = Form(...),
+        gender: str = Form(...),
+        who_eat_with: str = Form(...),
+        rainbow_colors: List[str] = Form([]),
+        health_goal: str = Form(...),
+        dietary_preference: str = Form(None),
+        special_conditions: List[str] = Form([]),
+        feel_best: str = Form(None),
+        cuisines: List[str] = Form([]),
+        flavor_story: str = Form(None),
+        reinvent_dish: str = Form(None),
+        activity_level: str = Form(...),
+        energy_levels: str = Form(None),
+        appliances: List[str] = Form([]),
+        food_access: str = Form(...),
+        food_budget: str = Form(...),
         meals_per_day: str = Form(...),
-        challenge: str = Form(...)
+        cooking_time: str = Form(None),
+        challenges: str = Form(None),
+        plan_duration: int = Form(3)
     ):
-        """Handle quiz form submission and display personalized plan"""
-        logger.info(f"Quiz submitted: {{'name': '{name}', 'goal': '{goal}', 'meals_per_day': '{meals_per_day}'}}")
-        
-        # Create a simple meal plan summary
-        cuisines_text = ", ".join(cuisine) if cuisine else "Various"
-        plan_items = [
-            f"Health Goal: {goal}",
-            f"Preferred Cuisines: {cuisines_text}",
-            f"Daily Meal Structure: {meals_per_day} meals",
-            f"Main Challenge Addressed: {challenge}",
-            "✨ Your personalized Flavor-First meal plan is being prepared!",
-            "🌈 Includes rainbow nutrition tracking",
-            "💪 Tailored to your health goals"
-        ]
-        
-        return templates.TemplateResponse("plan.html", {
-            "request": request,
-            "result": {
+        """Handle 6-step quiz form submission and display personalized meal plan"""
+        try:
+            logger.info(f"Quiz submitted: {{'name': '{name}', 'email': '{email}', 'plan_duration': {plan_duration}}}")
+            
+            # Build user profile
+            user_profile = {
                 "name": name,
-                "goal": goal
-            },
-            "plan": plan_items,
-            "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p")
-        })
+                "email": email,
+                "age": age,
+                "gender": gender,
+                "who_eat_with": who_eat_with,
+                "rainbow_colors": rainbow_colors,
+                "health_goal": health_goal,
+                "dietary_preference": dietary_preference,
+                "special_conditions": special_conditions,
+                "feel_best": feel_best,
+                "cuisines": cuisines if cuisines else ["Mediterranean"],
+                "flavor_story": flavor_story,
+                "reinvent_dish": reinvent_dish,
+                "activity_level": activity_level,
+                "energy_levels": energy_levels,
+                "appliances": appliances,
+                "food_access": food_access,
+                "food_budget": food_budget,
+                "meals_per_day": meals_per_day,
+                "cooking_time": cooking_time,
+                "challenges": challenges,
+                "plan_duration": plan_duration
+            }
+            
+            # Freemium control logic
+            is_premium = plan_duration > 3
+            
+            # Generate meal plan using master engine
+            if HAS_MASTER_ENGINE:
+                meal_plan = generate_enhanced_meal_plan(user_profile)
+                pdf_recommendations = get_enhanced_recommended_pdfs(user_profile)
+                nutrition_score = calculate_nutrition_score(meal_plan)
+                
+                # Add freemium messaging
+                if is_premium:
+                    meal_plan["is_premium"] = True
+                    meal_plan["premium_message"] = "✨ Unlock your full 7-day plan with WelFore Premium!"
+                    meal_plan["stripe_link"] = STRIPE_7DAY_LINK if plan_duration == 7 else STRIPE_14DAY_LINK
+                else:
+                    meal_plan["is_premium"] = False
+                
+                return templates.TemplateResponse("results.html", {
+                    "request": request,
+                    "meal_plan": meal_plan,
+                    "pdf_recommendations": pdf_recommendations,
+                    "nutrition_score": nutrition_score,
+                    "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p")
+                })
+            else:
+                # Fallback if master engine not available
+                return templates.TemplateResponse("results.html", {
+                    "request": request,
+                    "error": True,
+                    "error_message": "Meal plan generation is temporarily unavailable. Please try again later.",
+                    "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p")
+                })
+                
+        except Exception as e:
+            logger.error(f"Error processing quiz submission: {str(e)}", exc_info=True)
+            return templates.TemplateResponse("results.html", {
+                "request": request,
+                "error": True,
+                "error_message": "We encountered an issue processing your request. Please try again.",
+                "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p")
+            })
+    
     print("✅ Form submission endpoint registered")
 else:
     print("⚠️ Form submission endpoint skipped (python-multipart not installed)")
@@ -269,3 +387,18 @@ async def test_webhook(request: Request):
     payload = await request.json()
     logger.info(f"Test webhook received: {payload}")
     return {"status": "test_received", "payload": payload}
+
+# ---- SHUTDOWN LOG HANDLER ----
+import atexit
+from datetime import datetime
+
+def log_shutdown_message():
+    shutdown_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print("\n" + "-"*70)
+    print(f"🛑  {APP_NAME} shutting down gracefully at {shutdown_time}")
+    print(f"🧩  All services closed cleanly. See logs for details.")
+    print("-"*70 + "\n")
+
+# Register the shutdown handler
+atexit.register(log_shutdown_message)
+# ---- END SHUTDOWN LOG HANDLER ----

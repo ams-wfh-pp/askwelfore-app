@@ -1,0 +1,202 @@
+🧠 Comprehensive Replit Agent Prompt — “AskWelFore Wellness Reset” UX & Logic Enhancement
+GOAL
+
+Upgrade the current 6-step AskWelFore Wellness Reset quiz to make it:
+
+✨ Emotionally engaging and personal
+
+🌈 Faithful to the Eat-the-Rainbow + Family-Centered logic
+
+🏠 Inclusive of access, culture, and lifestyle context
+
+📊 Fully structured and backend-ready (no breaking main.py compatibility)
+
+1️⃣ Overall UX Enhancements
+
+Add a progress tracker (e.g. “Step 2 of 6”) above the purple progress bar on every page.
+
+Use conversational microcopy — warm, human, empowering tone.
+
+Add subtle emojis to legends and headers (like existing “🌈”, “💬”, etc.).
+
+Show subtle motivational text (“You’re almost there!”) on the last two steps.
+
+2️⃣ Step 1 – About You
+
+Keep: name, age, gender, family size, breastfeeding.
+Add:
+
+✅ Question: “Who do you usually cook or eat with?” (single select)
+
+Myself only
+
+Partner or spouse
+
+Kids or family
+
+Roommates or friends
+
+✅ Make name, age, gender, and activity level mandatory.
+
+✅ Retain the breastfeeding toggle logic (only shown if gender = female).
+
+3️⃣ Step 2 – Rainbow Food Preferences
+
+Replace the current step with this logic:
+
+✅ One “color group” at a time with checkboxes + text field (Other (comma-separated)).
+
+✅ Include a short header at top:
+“Eating the rainbow means filling your plate with color and variety. Choose your favorite foods in each group!”
+
+✅ Keep your food_options dictionary structure unchanged.
+
+✅ Add “You’ve selected X of 6 colors!” at bottom, updated dynamically.
+
+✅ Mark as required to select at least one color group before moving on.
+
+4️⃣ Step 3 – Health Goals & Restrictions
+
+Add warmth + definitions:
+
+Each health goal checkbox should have a friendly tooltip or small subtext, e.g.
+
+Heart Health → “Lower sodium, more fiber, healthy fats.”
+
+GLP-1 Support → “If you’re on Ozempic or Mounjaro, we tailor portions and protein.”
+
+Add a short question:
+“What does feeling your best look like to you?” (short text answer, optional).
+
+5️⃣ Step 4 – Cuisines, Culture & Comfort
+
+Use the engaging, dynamic version we finalized earlier (the one with storytelling textarea + “Other” reveal).
+Add under the textarea:
+
+“If you could reinvent a favorite family dish to be lighter or salt-free, which one would it be?”
+Include this as a new text field: reinvent_dish.
+
+6️⃣ Step 5 – Lifestyle & Habits (Major Overhaul)
+
+Make this step feel like a conversation — not a census.
+
+Add these questions:
+
+“What does a typical weekday look like for you?” (dropdown)
+
+Mostly seated or at a desk
+
+On your feet most of the day
+
+Physically active job or outdoor work
+
+Constantly on the go / caring for others
+
+“How would you describe your energy levels most days?”
+
+Low 😴
+
+Okay ⚖️
+
+High ⚡
+
+“Do you have access to these cooking tools?” (multi-select)
+
+Stove
+
+Oven
+
+Microwave
+
+Air fryer
+
+Blender
+
+None of the above
+
+“How often do you have access to fresh produce or groceries?”
+
+Always — I live near stores/farmers markets
+
+Sometimes — limited selection nearby
+
+Rarely — it’s hard to find or afford fresh foods (flag = food desert)
+
+“What’s your typical weekly food budget?”
+
+<$50 /week
+
+$50-100
+
+$100-150
+
+$150
+
+“How many meals do you usually eat each day?” (1-4, dropdown)
+
+“What’s your biggest challenge with healthy eating?” (text)
+
+✅ Make required: activity level, access to fresh foods, family size, and food budget.
+
+Activity Level → use this refined copy for clarity:
+
+Sedentary 🪑 – Mostly sitting or desk work
+
+Lightly Active 🚶 – Light exercise 1-3 days/week or active around the house
+
+Moderately Active 🏃 – Exercise 3-5 days/week, regular movement
+
+Very Active 💪 – Daily intense workouts or physical labor
+
+7️⃣ Step 6 – Choose Your Plan
+
+Keep the existing “fun” cards, but revise pricing logic as one-time purchases, not subscriptions.
+
+Replace pricing copy with:
+
+🎁 Free 3-Day Starter Plan — Perfect for trying the FlavURWay!
+
+💚 7-Day Wellness Plan — Includes complete menu + grocery list — $14.95
+
+🌟 14-Day Deep Reset — Includes full color analysis + bonus Flavor Reset Guide — $24.95
+
+✅ When selected, the corresponding value (plan_duration) still passes correctly to main.py.
+✅ Rename the CTA button to: “See My Personalized Plan 🌈”
+
+8️⃣ Accessibility & Flow
+
+Ensure all “Next” buttons validate required fields.
+
+Allow “Back” navigation to re-edit previous steps.
+
+Keep global error handling (no crash if form incomplete).
+
+9️⃣ Optional Styling / Feedback
+
+Add a small footer text below progress bar:
+
+“You’re building your Flavor-First Wellness Blueprint!”
+
+Use soft transitions between steps (fade/slide).
+
+Add a friendly success message on submit:
+
+“✨ Great job! Your personalized plan is generating...”
+
+✅ FILES AFFECTED
+
+/templates/plan.html — full update for steps 1-6 per this specification.
+
+/static/styles.css — add step progress counter and new color-group feedback styles.
+
+/main.py — no structural change needed, only verify that new form field names match current Form() definitions (add reinvent_dish, flavor_story, food_access, and appliances if missing).
+
+📋 Acceptance Criteria
+
+Sequential 6-step quiz with conversational tone and “Step X of 6” visible.
+
+Responsive, mobile-friendly UI.
+
+Mandatory logic works correctly.
+
+All form data posts cleanly to main.py and displays in plan summary.

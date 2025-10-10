@@ -3,63 +3,646 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your WelFore Personalized Plan</title>
+    <title>AskWelFore | Your Flav.UR.Way Wellness Reset</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 16px; 
+            padding: 40px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+        }
         .award-banner { text-align: center; margin-bottom: 25px; }
         .award-banner img { max-width: 220px; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2)); }
         .award-caption { font-size: 0.95rem; color: #4a5568; font-weight: 600; margin-top: 8px; }
-        .error { background: #fed7d7; border-left: 4px solid #fc8181; padding: 20px; border-radius: 8px; margin: 20px 0; }
-        .error h2 { color: #c53030; margin-bottom: 10px; }
-        .error p { color: #742a2a; }
-        .confirmation { background: #c6f6d5; border-left: 4px solid #48bb78; padding: 20px; border-radius: 8px; margin: 20px 0; }
-        .confirmation h2 { color: #22543d; margin-bottom: 10px; font-size: 1.6rem; }
-        .confirmation p { color: #276749; line-height: 1.6; }
-        .summary { margin-top: 30px; }
-        .summary h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.3rem; }
-        .summary ul { list-style: none; padding: 0; }
-        .summary li { background: #f7fafc; padding: 12px; margin-bottom: 8px; border-radius: 6px; border-left: 3px solid #667eea; }
-        .timestamp { text-align: center; color: #718096; font-size: 0.9rem; margin-top: 30px; }
+        
+        .intro { text-align: center; margin-bottom: 20px; }
+        .intro h1 { color: #2d3748; font-size: 1.8rem; margin-bottom: 10px; }
+        .intro p { color: #4a5568; line-height: 1.6; max-width: 750px; margin: 0 auto; }
+        
+        .step-counter { 
+            text-align: center; 
+            color: #667eea; 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            margin-bottom: 10px; 
+        }
+        
+        .progress-footer {
+            text-align: center;
+            color: #667eea;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        
+        .progress-bar { width: 100%; height: 8px; background: rgba(102,126,234,0.15); border-radius: 4px; margin: 25px 0; }
+        .progress { height: 100%; background: linear-gradient(135deg,#667eea,#764ba2); border-radius: 4px; width: 0%; transition: width 0.4s ease; }
+        
+        fieldset { 
+            display: none; 
+            border: none; 
+            margin: 20px 0; 
+            animation: fadeIn 0.5s ease;
+        }
+        fieldset.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        legend { 
+            color: #2d3748; 
+            font-size: 1.5rem; 
+            font-weight: 600; 
+            margin-bottom: 12px; 
+            width: 100%;
+        }
+        
+        .fieldset-description {
+            color: #4a5568;
+            margin-bottom: 20px;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+        
+        .encouragement-footer {
+            background: #f0f4ff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #5a67d8;
+            font-style: italic;
+            font-size: 0.95rem;
+            border-left: 3px solid #667eea;
+        }
+        
+        label { 
+            display: block; 
+            color: #4a5568; 
+            margin-bottom: 8px; 
+            font-weight: 500; 
+        }
+        
+        input[type="text"], 
+        input[type="email"], 
+        input[type="number"], 
+        select, 
+        textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            margin-bottom: 15px; 
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { 
+            outline: none; 
+            border-color: #667eea; 
+        }
+        
+        .checkbox-label { 
+            display: block; 
+            margin-bottom: 12px; 
+            cursor: pointer; 
+            color: #4a5568;
+            padding: 8px 0;
+            transition: color 0.2s;
+        }
+        .checkbox-label:hover { color: #2d3748; }
+        .checkbox-label input { margin-right: 8px; cursor: pointer; }
+        .checkbox-sublabel {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-left: 24px;
+            font-style: italic;
+        }
+        
+        .cuisine-table { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; 
+            margin: 20px 0; 
+        }
+        .cuisine-column h4 { 
+            color: #667eea; 
+            margin-bottom: 12px; 
+            font-size: 1.1rem; 
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button { 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; 
+            border: none; 
+            padding: 14px 32px; 
+            border-radius: 8px; 
+            font-size: 1.05rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            flex: 1;
+        }
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4); 
+        }
+        button.back-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        button.back-btn:hover {
+            background: #cbd5e0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .plan-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .plan-option {
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .plan-option:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+            transform: translateY(-2px);
+        }
+        .plan-option input[type="radio"] {
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        .plan-option .plan-title {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .plan-option .plan-price {
+            color: #667eea;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .trust-ribbon {
+            text-align: center;
+            font-size: 0.85em;
+            color: #4a5568;
+            font-style: italic;
+            margin-top: 30px;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+        .trust-ribbon:hover {
+            opacity: 1;
+            color: #2d3748;
+        }
+        
+        .conditional-field {
+            display: none;
+            margin-left: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .conditional-field.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 🏆 Award Banner -->
         <div class="award-banner">
             <img src="/static/WELFORE.png" alt="Digital Health Hub Rising Star Finalist 2025 - WelFore Health">
             <p class="award-caption">🏆 Recognized Globally for Innovation in Wellness & Prevention</p>
         </div>
 
-        {% if error %}
-        <div class="error">
-            <h2>Oops! Something went wrong.</h2>
-            <p>{{ error_message }}</p>
+        <div class="intro">
+            <h1>Welcome to Your Flav.UR.Way Wellness Reset</h1>
+            <p>Let's personalize your Flavor-First, Family-Centered path to better health. Every answer helps us design something that's authentically you.</p>
         </div>
-        {% endif %}
 
-        {% if result %}
-        <div class="confirmation">
-            <h2>🌈 Your Personalized Meal Plan</h2>
-            <p><strong>{{ result.name }}</strong>, here's your Flavor-First plan to reach your <strong>{{ result.goal }}</strong> goal.</p>
+        <div class="step-counter" id="stepCounter">Step 1 of 6</div>
+        <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
         </div>
-        {% endif %}
+        <div class="progress-footer">You're building your Flavor-First Wellness Blueprint!</div>
 
-        {% if plan %}
-        <div class="summary">
-            <h3>📋 Plan Summary</h3>
-            <ul>
-                {% for item in plan %}
-                <li>{{ item }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+        <form id="quizForm" method="POST" action="/submit">
+            <!-- Step 1: Tell Us About You -->
+            <fieldset data-step="1" class="active">
+                <legend>👋 Let's Get to Know You</legend>
+                <div class="fieldset-description">
+                    We believe wellness starts with understanding you — your family, your lifestyle, and your goals. Tell us a little about who's around your table and how you live day to day. Every answer helps us tailor a plan that fits your real life, not someone else's.
+                </div>
+                
+                <label for="name">Your Name *</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                
+                <label for="email">Your Email *</label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                
+                <label for="age">Your Age *</label>
+                <input type="number" id="age" name="age" placeholder="Age" min="18" max="120" required>
+                
+                <label for="gender">Gender *</label>
+                <select id="gender" name="gender" required>
+                    <option value="">Select...</option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                    <option value="non-binary">Non-Binary</option>
+                    <option value="prefer-not-to-say">Prefer Not to Say</option>
+                </select>
+                
+                <label for="who_eat_with">Who do you usually cook or eat with? *</label>
+                <select id="who_eat_with" name="who_eat_with" required>
+                    <option value="">Select...</option>
+                    <option value="myself">Myself only</option>
+                    <option value="partner">Partner or spouse</option>
+                    <option value="family">Kids or family</option>
+                    <option value="roommates">Roommates or friends</option>
+                </select>
+                
+                <div id="breastfeedingField" class="conditional-field">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="special_conditions" value="breastfeeding">
+                        Currently breastfeeding
+                    </label>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="next-btn" onclick="nextStep()">Next</button>
+                </div>
+                
+                <div class="trust-ribbon">
+                    🏅 Backed by 10+ years of research and real-world results — including an ADA-funded clinical study with Eastern Virginia Medical School.
+                </div>
+            </fieldset>
 
-        {% if generated_at %}
-        <p class="timestamp">Generated on {{ generated_at }}</p>
-        {% endif %}
+            <!-- Step 2: Rainbow Food Preferences -->
+            <fieldset data-step="2">
+                <legend>🌈 What Colors Brighten Your Plate?</legend>
+                <div class="fieldset-description">
+                    Eating the rainbow means celebrating variety — the reds, greens, oranges, and purples that fuel your body and your joy. Choose the fruits and veggies you love most from each color group. If something's missing, tell us! We'll weave your favorites into your flavor plan.
+                </div>
+                
+                <label class="checkbox-label">
+                    <input type="checkbox" name="rainbow_colors" value="red"> 🔴 Red Foods (tomatoes, strawberries, red peppers)
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="rainbow_colors" value="orange"> 🟠 Orange Foods (carrots, sweet potatoes, oranges)
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="rainbow_colors" value="yellow"> 🟡 Yellow Foods (bananas, corn, yellow squash)
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="rainbow_colors" value="green"> 🟢 Green Foods (spinach, broccoli, avocados)
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="rainbow_colors" value="blue-purple"> 🟣 Blue/Purple Foods (blueberries, eggplant, purple cabbage)
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="rainbow_colors" value="white"> ⚪ White Foods (cauliflower, onions, garlic)
+                </label>
+                
+                <div class="encouragement-footer">
+                    Each color brings its own nutrients and healing power — aim for all six daily!
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="back-btn" onclick="previousStep()">Back</button>
+                    <button type="button" class="next-btn" onclick="nextStep()">Next</button>
+                </div>
+                
+                <div class="trust-ribbon">
+                    🔬 Clinically evaluated & trusted by 500,000+ families.
+                </div>
+            </fieldset>
+
+            <!-- Step 3: Health Goals & Dietary Preferences -->
+            <fieldset data-step="3">
+                <legend>💪 What Does "Feeling Your Best" Mean to You?</legend>
+                <div class="fieldset-description">
+                    Wellness looks different for everyone. Some want more energy, others need balance or recovery. Select the health goals that matter most to you, and we'll build your plan around them — whether it's supporting your heart, balancing blood sugar, or keeping your glow strong.
+                </div>
+                
+                <label for="health_goal">Your Primary Health Goal *</label>
+                <select id="health_goal" name="health_goal" required>
+                    <option value="">Select Your Goal</option>
+                    <option value="weight_loss">Weight Management</option>
+                    <option value="blood_pressure">Lower Blood Pressure</option>
+                    <option value="blood_sugar">Stabilize Blood Sugar</option>
+                    <option value="energy">Increase Energy</option>
+                    <option value="digestive">Improve Gut Health</option>
+                    <option value="heart_health">Heart Health — Lower sodium, more fiber, healthy fats</option>
+                    <option value="diabetes_prevention">Diabetes Prevention</option>
+                </select>
+                
+                <label for="dietary_preference">Any Dietary Restrictions?</label>
+                <select id="dietary_preference" name="dietary_preference">
+                    <option value="">No Restrictions</option>
+                    <option value="vegetarian">Vegetarian</option>
+                    <option value="vegan">Vegan</option>
+                    <option value="gluten-free">Gluten-Free</option>
+                    <option value="dairy-free">Dairy-Free</option>
+                    <option value="low-carb">Low-Carb</option>
+                    <option value="halal">Halal</option>
+                    <option value="kosher">Kosher</option>
+                </select>
+                
+                <label class="checkbox-label">
+                    <input type="checkbox" name="special_conditions" value="glp1"> Currently on GLP-1 medications (Ozempic, Wegovy, etc.)
+                    <div class="checkbox-sublabel">If you're on Ozempic or Mounjaro, we tailor portions and protein</div>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" name="special_conditions" value="bariatric"> Post-bariatric surgery
+                </label>
+                
+                <label for="feel_best">What does feeling your best look like to you? (optional)</label>
+                <textarea id="feel_best" name="feel_best" rows="2" placeholder="Share your vision of wellness..."></textarea>
+                
+                <div class="encouragement-footer">
+                    Your goals guide your plate — every bite should move you closer to feeling amazing.
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="back-btn" onclick="previousStep()">Back</button>
+                    <button type="button" class="next-btn" onclick="nextStep()">Next</button>
+                </div>
+                
+                <div class="trust-ribbon">
+                    🏅 Backed by 10+ years of research and real-world results.
+                </div>
+            </fieldset>
+
+            <!-- Step 4: Favorite Cuisines & Cultural Heritage -->
+            <fieldset data-step="4">
+                <legend>🍽️ What Flavors Feel Like Home?</legend>
+                <div class="fieldset-description">
+                    Food is more than fuel — it's family, memory, and identity. Select the cuisines that bring you joy or reflect your heritage. Then share a story about a dish that means something to you — the comfort food you crave, the celebration meal that brings everyone together, or the flavor that makes you smile.
+                </div>
+
+                <div class="cuisine-table">
+                    <div class="cuisine-column">
+                        <h4>Americas</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="African American"> African American / Soul Food</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Caribbean"> Caribbean</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Creole"> Creole / Cajun</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mexican"> Mexican</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Central American"> Central American</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South American"> South American</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Cuban"> Cuban</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Puerto Rican"> Puerto Rican</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Dominican"> Dominican</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Native American"> Native American / Indigenous</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Tex-Mex"> Tex-Mex</label>
+                    </div>
+
+                    <div class="cuisine-column">
+                        <h4>Africa</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="West African"> West African</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East African"> East African</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="North African"> North African</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southern African"> Southern African</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Caribbean-African Fusion"> Caribbean–African Fusion</label>
+                    </div>
+
+                    <div class="cuisine-column">
+                        <h4>Asia, Middle East & Europe</h4>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South Asian"> South Asian (Indian, Pakistani, Sri Lankan)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East Asian"> East Asian (Chinese, Japanese, Korean)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southeast Asian"> Southeast Asian (Thai, Vietnamese, Filipino)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Middle Eastern"> Middle Eastern (Lebanese, Persian, Turkish)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Italian"> Italian</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Greek"> Greek</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Spanish"> Spanish / Tapas</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="French"> French</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mediterranean"> Mediterranean</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Fusion"> Fusion / Modern Global</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Other"> Other</label>
+                    </div>
+                </div>
+                
+                <label for="flavor_story">Share a story about a dish that means something to you (optional)</label>
+                <textarea id="flavor_story" name="flavor_story" rows="3" placeholder="The comfort food you crave, the celebration meal that brings everyone together, or the flavor that makes you smile..."></textarea>
+                
+                <label for="reinvent_dish">If you could reinvent a favorite family dish to be lighter or salt-free, which one would it be? (optional)</label>
+                <input type="text" id="reinvent_dish" name="reinvent_dish" placeholder="e.g., Grandma's fried chicken, mac and cheese...">
+                
+                <div class="encouragement-footer">
+                    Your culture isn't a restriction — it's the flavor foundation of your wellness journey.
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="back-btn" onclick="previousStep()">Back</button>
+                    <button type="button" class="next-btn" onclick="nextStep()">Next</button>
+                </div>
+                
+                <div class="trust-ribbon">
+                    🔬 Clinically evaluated & trusted by 500,000+ families.
+                </div>
+            </fieldset>
+
+            <!-- Step 5: Lifestyle & Habits -->
+            <fieldset data-step="5">
+                <legend>🏡 Let's Make It Work for Your Life</legend>
+                <div class="fieldset-description">
+                    Healthy living isn't one-size-fits-all — it's about meeting you where you are. Tell us how you move, cook, shop, and manage your day. We'll design a realistic plan that fits your time, budget, and kitchen setup — because flavor and balance should never depend on perfect conditions.
+                </div>
+                
+                <label for="activity_level">What does a typical weekday look like for you? *</label>
+                <select id="activity_level" name="activity_level" required>
+                    <option value="">Select...</option>
+                    <option value="sedentary">🪑 Sedentary — Mostly sitting or desk work</option>
+                    <option value="lightly_active">🚶 Lightly Active — Light exercise 1-3 days/week or active around the house</option>
+                    <option value="moderately_active">🏃 Moderately Active — Exercise 3-5 days/week, regular movement</option>
+                    <option value="very_active">💪 Very Active — Daily intense workouts or physical labor</option>
+                </select>
+                
+                <label for="energy_levels">How would you describe your energy levels most days?</label>
+                <select id="energy_levels" name="energy_levels">
+                    <option value="">Select...</option>
+                    <option value="low">😴 Low</option>
+                    <option value="okay">⚖️ Okay</option>
+                    <option value="high">⚡ High</option>
+                </select>
+                
+                <label>Do you have access to these cooking tools? (select all that apply)</label>
+                <label class="checkbox-label"><input type="checkbox" name="appliances" value="stove"> Stove</label>
+                <label class="checkbox-label"><input type="checkbox" name="appliances" value="oven"> Oven</label>
+                <label class="checkbox-label"><input type="checkbox" name="appliances" value="microwave"> Microwave</label>
+                <label class="checkbox-label"><input type="checkbox" name="appliances" value="air_fryer"> Air fryer</label>
+                <label class="checkbox-label"><input type="checkbox" name="appliances" value="blender"> Blender</label>
+                <label class="checkbox-label"><input type="checkbox" name="appliances" value="none"> None of the above</label>
+                
+                <label for="food_access">How often do you have access to fresh produce or groceries? *</label>
+                <select id="food_access" name="food_access" required>
+                    <option value="">Select...</option>
+                    <option value="always">Always — I live near stores/farmers markets</option>
+                    <option value="sometimes">Sometimes — limited selection nearby</option>
+                    <option value="rarely">Rarely — it's hard to find or afford fresh foods</option>
+                </select>
+                
+                <label for="food_budget">What's your typical weekly food budget? *</label>
+                <select id="food_budget" name="food_budget" required>
+                    <option value="">Select...</option>
+                    <option value="under_50">&lt;$50 /week</option>
+                    <option value="50_100">$50-100</option>
+                    <option value="100_150">$100-150</option>
+                    <option value="over_150">$150+</option>
+                </select>
+                
+                <label for="meals_per_day">How many meals do you usually eat each day? *</label>
+                <select id="meals_per_day" name="meals_per_day" required>
+                    <option value="">Select...</option>
+                    <option value="1">1 Meal</option>
+                    <option value="2">2 Meals</option>
+                    <option value="3">3 Meals</option>
+                    <option value="4">4+ Meals</option>
+                </select>
+                
+                <label for="cooking_time">Time Available for Cooking?</label>
+                <select id="cooking_time" name="cooking_time">
+                    <option value="">Select...</option>
+                    <option value="under_15">Under 15 minutes</option>
+                    <option value="15_30">15-30 minutes</option>
+                    <option value="30_60">30-60 minutes</option>
+                    <option value="over_60">Over 60 minutes</option>
+                </select>
+                
+                <label for="challenges">What's your biggest challenge with healthy eating?</label>
+                <textarea id="challenges" name="challenges" rows="3" placeholder="e.g., time, taste, cost, variety..."></textarea>
+                
+                <div class="encouragement-footer">
+                    Your plan should flex around your life — not the other way around. You're almost there!
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="back-btn" onclick="previousStep()">Back</button>
+                    <button type="button" class="next-btn" onclick="nextStep()">Next</button>
+                </div>
+                
+                <div class="trust-ribbon">
+                    🏅 Backed by 10+ years of research and real-world results.
+                </div>
+            </fieldset>
+
+            <!-- Step 6: Choose Your Plan -->
+            <fieldset data-step="6">
+                <legend>🚀 You're Almost There!</legend>
+                <div class="fieldset-description">
+                    You've personalized your Flav.UR.Way Wellness Blueprint — now let's unlock your plan. Start with a free 3-day taste test or go all in for 7 or 14 days of recipes, shopping lists, and practical flavor coaching.
+                </div>
+                
+                <div class="plan-options">
+                    <label class="plan-option">
+                        <input type="radio" name="plan_duration" value="3" checked required>
+                        <div class="plan-title">🎁 Free 3-Day Starter Plan</div>
+                        <div class="plan-price">FREE</div>
+                        <p style="font-size: 0.9rem; color: #718096; margin-top: 8px;">Perfect for trying the Flav.UR.Way!</p>
+                    </label>
+                    <label class="plan-option">
+                        <input type="radio" name="plan_duration" value="7" required>
+                        <div class="plan-title">💚 7-Day Wellness Plan</div>
+                        <div class="plan-price">$14.95</div>
+                        <p style="font-size: 0.9rem; color: #718096; margin-top: 8px;">Complete menu + grocery list</p>
+                    </label>
+                    <label class="plan-option">
+                        <input type="radio" name="plan_duration" value="14" required>
+                        <div class="plan-title">🌟 14-Day Deep Reset</div>
+                        <div class="plan-price">$24.95</div>
+                        <p style="font-size: 0.9rem; color: #718096; margin-top: 8px;">Full color analysis + bonus guide</p>
+                    </label>
+                </div>
+                
+                <div class="encouragement-footer">
+                    Great job! You've built something that's as unique as you are. Let's bring your flavor-first reset to life.
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="back-btn" onclick="previousStep()">Back</button>
+                    <button type="submit">See My Personalized Plan 🌈</button>
+                </div>
+                
+                <div class="trust-ribbon">
+                    🌿 The Flav.UR.Way System — Recognized globally for innovation in Wellness & Prevention (Digital Health Hub Finalist, 2025).
+                </div>
+            </fieldset>
+        </form>
     </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 6;
+
+        function updateProgress() {
+            const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('stepCounter').textContent = `Step ${currentStep} of ${totalSteps}`;
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('fieldset').forEach(fieldset => {
+                fieldset.classList.remove('active');
+            });
+            const currentFieldset = document.querySelector(`fieldset[data-step="${step}"]`);
+            if (currentFieldset) {
+                currentFieldset.classList.add('active');
+            }
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        // Show/hide breastfeeding field based on gender
+        document.getElementById('gender').addEventListener('change', function() {
+            const breastfeedingField = document.getElementById('breastfeedingField');
+            if (this.value === 'female') {
+                breastfeedingField.classList.add('show');
+            } else {
+                breastfeedingField.classList.remove('show');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showStep(currentStep);
+        });
+    </script>
 </body>
 </html>

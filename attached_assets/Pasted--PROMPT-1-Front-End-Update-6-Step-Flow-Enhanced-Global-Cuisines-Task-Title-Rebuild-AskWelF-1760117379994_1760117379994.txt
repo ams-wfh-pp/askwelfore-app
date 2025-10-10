@@ -1,0 +1,193 @@
+🥇 PROMPT 1 — Front-End Update (6-Step Flow + Enhanced Global Cuisines)
+
+Task Title: Rebuild AskWelFore App — Preserve 6-Step Flow & Integrate Enhanced Cuisines
+
+Objective:
+Update /templates/plan.html so it follows the 6-step Eat-the-Rainbow questionnaire and includes the new multicultural cuisine fieldset, without touching any other logic or variables.
+
+6 Steps to Preserve
+1️⃣ Tell Us About Yourself
+2️⃣ Rainbow Food Preferences
+3️⃣ Health Goals & Dietary Preferences
+4️⃣ Favorite Cuisines & Cultural Heritage — ✅ replace this section with the code below
+5️⃣ Lifestyle & Habits
+6️⃣ Choose Your Plan
+
+Replace Step 4 block in /templates/plan.html with this:
+
+<!-- Cuisine Preferences Section -->
+<fieldset data-step="4">
+  <legend>🍽️ Which cuisines make you happiest?</legend>
+  <div class="fieldset-description">
+    Select all cuisines that you enjoy or that best represent your heritage.  
+    This helps us personalize flavor-forward meal plans that feel familiar, joyful, and sustainable.
+  </div>
+
+  <div class="cuisine-table">
+    <!-- Americas Column -->
+    <div class="cuisine-column">
+      <h4>Americas</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="African American"> African American / Soul Food</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Caribbean"> Caribbean</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Creole"> Creole / Cajun</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mexican"> Mexican</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Central American"> Central American</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South American"> South American</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Cuban"> Cuban</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Puerto Rican"> Puerto Rican</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Dominican"> Dominican</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Native American"> Native American / Indigenous North American</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Tex-Mex"> Tex-Mex</label>
+    </div>
+
+    <!-- Africa Column -->
+    <div class="cuisine-column">
+      <h4>Africa</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="West African"> West African</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East African"> East African</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="North African"> North African</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southern African"> Southern African</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Caribbean-African Fusion"> Caribbean–African Fusion</label>
+    </div>
+
+    <!-- Asia, Middle East, and Europe Column -->
+    <div class="cuisine-column">
+      <h4>Asia, Middle East & Europe</h4>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="South Asian"> South Asian (Indian, Pakistani, Bangladeshi, Sri Lankan)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="East Asian"> East Asian (Chinese, Japanese, Korean)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Southeast Asian"> Southeast Asian (Thai, Vietnamese, Filipino, Indonesian)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Middle Eastern"> Middle Eastern (Lebanese, Persian, Turkish)</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Italian"> Italian</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Greek"> Greek</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Spanish"> Spanish / Tapas</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="French"> French</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Mediterranean"> Mediterranean</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Fusion"> Fusion / Modern Global</label>
+      <label class="checkbox-label"><input type="checkbox" name="cuisines" value="Other"> Other (please specify)</label>
+    </div>
+  </div>
+</fieldset>
+
+
+Deliverable:
+/templates/plan.html displays all six steps sequentially, with the new cuisine options rendered in three responsive columns.
+
+🥈 PROMPT 2 — Backend Rebuild (main.py + master_engine.py)
+
+Task Title: Restore AskWelFore Backend — Freemium Logic + Eat-the-Rainbow Engine
+
+Objective:
+Rebuild main.py and master_engine.py so they once again generate culturally attuned, fiber- and color-balanced plans with 3-day-free / 7-day-premium logic.
+
+Core Requirements
+
+main.py defines FastAPI app, static mounts, / GET & POST routes, /health endpoint.
+
+Imports from master_engine.py:
+
+from master_engine import generate_enhanced_meal_plan, get_enhanced_recommended_pdfs
+
+
+On POST, build user_profile exactly per previous spec, call the generator, and return plan.html TemplateResponse.
+
+Freemium control:
+
+is_premium = plan_duration > 3
+if is_premium:
+    plan["is_premium"] = True
+    plan["premium_message"] = "✨ Unlock your full 7-day plan with WelFore Premium!"
+else:
+    plan["is_premium"] = False
+
+
+Catch exceptions gracefully and display an error card rather than crashing.
+
+Add /health returning {"status": "ok"}.
+
+master_engine.py must contain:
+
+generate_enhanced_meal_plan(user_profile) implementing:
+
+5-color diversity ≥ 5 colors/day
+
+Fiber ≥ 20 g, Protein ≥ 60 g
+
+Hydration tips + breastfeeding adjustment
+
+GLP-1 / bariatric adaptation (–30 % portions, protein priority)
+
+Cultural cuisine matching via user_profile["cuisines"]
+
+get_enhanced_recommended_pdfs(user_profile) choosing guides (Heart, Diabetes, Liver, GLP-1, etc.).
+
+Packages to verify/install
+
+fastapi
+uvicorn
+jinja2
+requests
+python-multipart
+pydantic
+aiofiles
+python-dateutil
+
+
+Run command in .replit
+
+run = "python3 -m uvicorn main:app --host=0.0.0.0 --port=5000 --reload"
+
+
+Deliverable:
+Stable, crash-proof backend producing rainbow-balanced meal plans and wellness-guide PDFs, with freemium gating and health-check endpoint active.
+
+🥉 PROMPT 3 — UX Polish + Deployment Setup
+
+Task Title: Enhance UX (stepper + progress bar) and prepare for deployment
+
+Objective:
+Add step-by-step navigation and publish-ready configuration without altering business logic.
+
+Add to /templates/plan.html:
+
+Step indicator block (#step-indicator) above the first <fieldset>
+
+data-step="1" … "6" attributes on each fieldset
+
+“Back / Next” buttons per step (hidden where appropriate)
+
+JS (stepper controller) and CSS (progress bar) from the previous message
+
+Deployment config
+
+.replit →
+
+run = "python3 -m uvicorn main:app --host=0.0.0.0 --port=5000"
+
+
+for publish; revert to --reload for dev.
+
+requirements.txt → include all packages above.
+
+pip install -r requirements.txt once before publishing.
+
+Verify /health returns 200 OK.
+
+Rename deployment to askwelfore.replit.app (to remove “app app”).
+
+Deliverable:
+A polished, mobile-friendly 6-step AskWelFore experience with animated progress bar, clear navigation, and stable public deployment URL.
+
+✅ Execution Order
+
+#	Prompt	Key Output
+1	Front-End (6-Step + Cuisines)	Restores form & UI structure
+2	Backend Rebuild	Restores generator, logic, freemium
+3	UX Polish + Deploy	Adds stepper + prepares hosting
+
+Once all three complete:
+
+Test locally (Run → fill the form → submit)
+
+Confirm /health returns OK
+
+Then Publish → share https://askwelfore.replit.app
