@@ -6,3 +6,5 @@ pydantic
 python-dateutil
 python-multipart
 requests
+itsdangerous
+email-validator
