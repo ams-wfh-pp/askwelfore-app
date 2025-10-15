@@ -3,8 +3,8 @@ uvicorn
 jinja2
 aiofiles
 pydantic
-python-dateutil
-python-multipart
 requests
 itsdangerous
 email-validator
+python-multipart
+python-dateutil
