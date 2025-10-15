@@ -331,6 +331,23 @@
         {% if generated_at %}
         <p class="timestamp">Generated on {{ generated_at }}</p>
         {% endif %}
+    {% endif %}
+{% if generated_at %}
+<div class="share-section" style="text-align:center; margin-top:50px; padding:25px; background:linear-gradient(135deg,#fff7ed,#fef3c7); border-radius:16px; box-shadow:0 6px 12px rgba(0,0,0,0.08);">
+  <h3 style="color:#9a3412; font-size:1.6em; margin-bottom:10px;">💬 Share Your Flavor Balance!</h3>
+  <p style="color:#78350f; margin-bottom:20px; font-size:1.05rem;">
+    Proud of your <strong>{{ flavor_balance_index }}/100</strong>?  
+    Inspire friends and family to eat the rainbow too.  
+  </p>
+  <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https://askwelfore.com&quote=I just unlocked my Flavor Balance Index on AskWelFore! 🌈" target="_blank" class="share-btn" style="background:#1877f2;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Share on Facebook</a>
+    <a href="https://twitter.com/intent/tweet?text=I%20just%20unlocked%20my%20Flavor%20Balance%20Index%20on%20AskWelFore!%20🌈%20Join%20me%20at%20https://askwelfore.com" target="_blank" class="share-btn" style="background:#1da1f2;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Share on X</a>
+    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://askwelfore.com" target="_blank" class="share-btn" style="background:#0077b5;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Share on LinkedIn</a>
+    <a href="mailto:?subject=Check%20out%20my%20Flavor%20Balance%20Index!&body=I%20just%20completed%20my%20Flavor%20Balance%20Index%20on%20AskWelFore.%20See%20what%20your%20personalized%20plan%20looks%20like%20at%20https://askwelfore.com" class="share-btn" style="background:#f97316;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Share by Email</a>
+  </div>
+  <p style="margin-top:20px; color:#92400e; font-size:0.9rem;">#EatTheRainbow #FlavorFirst #WelForeHealth #AskWelFore</p>
+</div>
+
     </div>
 </body>
 </html>
