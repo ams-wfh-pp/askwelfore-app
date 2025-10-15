@@ -25,7 +25,23 @@ ghl_integration = None
 email_service = None
 
 # ---- STARTUP LOG BANNER ----
-from datetime import datetime
+from datetime import datetime, date
+
+def calculate_age_from_birthday(birthday_str: str) -> int:
+    """Convert birthday (string) into integer age with 18+ safety rule"""
+    if not birthday_str:
+        return None
+    try:
+        # Handles both ISO (YYYY-MM-DD) and US (MM/DD/YYYY) formats
+        if "-" in birthday_str:
+            dob = datetime.strptime(birthday_str, "%Y-%m-%d").date()
+        else:
+            dob = datetime.strptime(birthday_str, "%m/%d/%Y").date()
+        age = (date.today() - dob).days // 365
+        return max(age, 18)
+    except Exception as e:
+        print(f"⚠️  Birthday parsing error: {e}")
+        return None
 
 APP_NAME = "AskWelFore App"
 APP_VERSION = "v1.1 – Global Finalist Edition"
