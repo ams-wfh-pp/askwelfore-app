@@ -58,6 +58,98 @@ CUISINE_MEALS = {
         "colors": ["red", "green", "orange", "white"]
     }
 }
+# ----------------------------------------------------------------------
+# WelFore Health | Master Engine v1.2 (Render + Premium Patch)
+# ----------------------------------------------------------------------
+import random
+from datetime import datetime
+
+STRIPE_7DAY_LINK = "https://buy.stripe.com/5kQ7sMddybXy8dsfUR7Vm0a"
+STRIPE_14DAY_LINK = "https://buy.stripe.com/14A28s7Te3r251gcIF7Vm0b"
+
+def generate_enhanced_meal_plan(user_profile):
+    """Return a realistic, structured meal plan for 3-day freemium or 7/14-day premium users."""
+    name = user_profile.get("name", "Friend")
+    goal = user_profile.get("health_goal", "General Wellness")
+    cuisines = user_profile.get("cuisines", ["Mediterranean"])
+    duration = int(user_profile.get("plan_duration", 3))
+    premium = duration > 3
+
+    # Random flavor suggestions per day
+    FLAVORS = [
+        "Smoky Jerk", "Coconut Curry", "Tropical Tuscan",
+        "Chili Calypso", "Pink Himalayan", "Zesty Lemon Herb"
+    ]
+
+    base_meals = [
+        {
+            "day": "Day 1",
+            "meals": [
+                "Breakfast: Oatmeal with berries and nuts",
+                "Lunch: Grilled chicken with rainbow veggies",
+                "Dinner: Stir-fry tofu with brown rice and edamame"
+            ]
+        },
+        {
+            "day": "Day 2",
+            "meals": [
+                "Breakfast: Greek yogurt parfait",
+                "Lunch: Salmon bowl with avocado and quinoa",
+                "Dinner: Lentil curry with mixed greens"
+            ]
+        },
+        {
+            "day": "Day 3",
+            "meals": [
+                "Breakfast: Spinach omelet with herbs",
+                "Lunch: Turkey and veggie wrap",
+                "Dinner: Roasted veggies with chickpeas and couscous"
+            ]
+        }
+    ]
+
+    # Extend plan for premium
+    if premium:
+        for d in range(4, duration + 1):
+            base_meals.append({
+                "day": f"Day {d}",
+                "meals": [
+                    f"Breakfast: Smoothie with {random.choice(FLAVORS)} spice hint",
+                    f"Lunch: Power grain bowl with {random.choice(FLAVORS)} dressing",
+                    f"Dinner: Protein-packed stew with {random.choice(FLAVORS)} seasoning"
+                ]
+            })
+
+    return {
+        "user": name,
+        "goal": goal,
+        "cuisine_focus": ", ".join(cuisines),
+        "premium": premium,
+        "days": duration,
+        "daily_plan": base_meals,
+        "premium_message": (
+            "✨ Unlock your full 7-day or 14-day Flavor Reset Plan below!"
+            if premium else
+            "You’re viewing your FREE 3-day Flavor Reset Sampler."
+        ),
+        "stripe_link": STRIPE_7DAY_LINK if duration == 7 else STRIPE_14DAY_LINK if duration > 7 else None,
+        "created_at": datetime.now().strftime("%B %d, %Y")
+    }
+
+def get_enhanced_recommended_pdfs(user_profile):
+    """Return relevant PDF recommendations."""
+    return [
+        {"title": "Flavor Reset Bowl Guide", "url": "https://storage.googleapis.com/msgsndr/cV8htRcgyqItDfgFkjVN/media/67f2bf0e0e320231bd956521.pdf"},
+        {"title": "Eat the Rainbow Checklist", "url": "https://start.welforehealth.com/flavor-reset"},
+        {"title": "Flavor-SMART Swaps", "url": "https://storage.googleapis.com/msgsndr/cV8htRcgyqItDfgFkjVN/media/682926ae9540101c33796e73.png"}
+    ]
+
+def calculate_nutrition_score(meal_plan):
+    """Simple mock scoring logic for demo."""
+    base_score = random.randint(70, 90)
+    if meal_plan.get("premium"):
+        base_score += 5
+    return min(base_score, 100)
 
 COLOR_FOODS = {
     "red": ["tomatoes", "strawberries", "red bell peppers", "beets", "watermelon"],
