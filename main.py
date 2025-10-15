@@ -12,7 +12,7 @@ from logger_utils import logger, purge_old_logs
 
 # Import master engine for meal plan generation
 try:
-    from master_engine import generate_enhanced_meal_plan, get_enhanced_recommended_pdfs, calculate_nutrition_score
+    from master_engine import generate_enhanced_meal_plan, get_enhanced_recommended_pdfs, calculate_flavor_balance_index
     HAS_MASTER_ENGINE = True
     print("✅ Master Engine loaded successfully")
 except Exception as e:
