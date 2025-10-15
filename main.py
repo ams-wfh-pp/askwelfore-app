@@ -120,6 +120,24 @@ else:
     print("⚠️ GHL/email functions stubbed (requests not available)")
 
 app = FastAPI()
+# --- BIRTHDAY → AGE AUTO-CONVERTER (for GHL quiz compatibility) ---
+from datetime import datetime, date
+
+def calculate_age_from_birthday(birthday_str: str) -> int:
+    """Convert birthday (string) into integer age with 18+ safety rule"""
+    if not birthday_str:
+        return None
+    try:
+        # Handles both ISO (YYYY-MM-DD) and US (MM/DD/YYYY) formats
+        if "-" in birthday_str:
+            dob = datetime.strptime(birthday_str, "%Y-%m-%d").date()
+        else:
+            dob = datetime.strptime(birthday_str, "%m/%d/%Y").date()
+        age = (date.today() - dob).days // 365
+        return max(age, 18)
+    except Exception as e:
+        print(f"⚠️  Birthday parsing error: {e}")
+        return None
 
 # Global exception handler to prevent crashes
 @app.exception_handler(Exception)
@@ -151,6 +169,17 @@ STRIPE_14DAY_LINK = os.getenv('STRIPE_14DAY_LINK', "https://buy.stripe.com/14A28
 async def startup_event():
     purge_old_logs()
     logger.info("WelFore Health App started")
+# --- PREFILL HANDLER FOR GHL REDIRECT (Render) ---
+from fastapi.responses import RedirectResponse
+
+@app.get("/prefill", response_class=RedirectResponse)
+async def prefill_to_quiz(first_name: str = None, email: str = None, phone: str = None, birthday: str = None):
+    """Redirect from GHL quiz → AskWelFore form with prefilled fields"""
+    # Convert birthday to age if present
+    age = calculate_age_from_birthday(birthday)
+    redirect_url = f"/?first_name={first_name or ''}&email={email or ''}&phone={phone or ''}&age={age or ''}"
+    return RedirectResponse(url=redirect_url)
+
 
 @app.get("/", response_class=HTMLResponse)
 async def show_quiz(request: Request):
