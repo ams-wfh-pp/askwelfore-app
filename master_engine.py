@@ -269,3 +269,51 @@ def calculate_nutrition_score(meal_plan: Dict[str, Any]) -> int:
     
     total_score = int(color_score + cultural_bonus + adaptation_bonus + base_score)
     return min(total_score, 100)
+# ----------------------------------------------------------------------
+# WelFore Health | Master Engine v1.1 (Render Patch)
+# ----------------------------------------------------------------------
+import random
+from datetime import datetime
+
+def generate_enhanced_meal_plan(user_profile):
+    """Return a mock but structured meal plan"""
+    name = user_profile.get("name", "Friend")
+    age = user_profile.get("age", 35)
+    goal = user_profile.get("health_goal", "General Wellness")
+    cuisines = user_profile.get("cuisines", ["Mediterranean"])
+
+    return {
+        "user": name,
+        "goal": goal,
+        "cuisine_focus": ", ".join(cuisines),
+        "daily_plan": [
+            {
+                "day": "Day 1",
+                "meals": [
+                    "Breakfast: Oatmeal with berries and nuts",
+                    "Lunch: Grilled chicken with rainbow veggies",
+                    "Dinner: Stir-fry tofu with brown rice and edamame"
+                ]
+            },
+            {
+                "day": "Day 2",
+                "meals": [
+                    "Breakfast: Greek yogurt parfait",
+                    "Lunch: Salmon bowl with avocado and quinoa",
+                    "Dinner: Lentil curry with mixed greens"
+                ]
+            }
+        ],
+        "created_at": datetime.now().strftime("%B %d, %Y")
+    }
+
+def get_enhanced_recommended_pdfs(user_profile):
+    """Return example PDF recommendations"""
+    return [
+        {"title": "Flavor Reset Bowl Guide", "url": "https://storage.googleapis.com/msgsndr/cV8htRcgyqItDfgFkjVN/media/67f2bf0e0e320231bd956521.pdf"},
+        {"title": "Eat the Rainbow Checklist", "url": "https://start.welforehealth.com/flavor-reset"}
+    ]
+
+def calculate_nutrition_score(meal_plan):
+    """Return a mock nutrition score"""
+    return random.randint(70, 95)
