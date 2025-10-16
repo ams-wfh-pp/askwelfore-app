@@ -344,13 +344,16 @@ if HAS_MULTIPART:
                 else:
                     meal_plan["is_premium"] = False
                 
-                return templates.TemplateResponse("results.html", {
+                flavor_balance_index = calculate_nutrition_score(meal_plan)
+
+return templates.TemplateResponse("results.html", {
     "request": request,
     "meal_plan": meal_plan,
     "pdf_recommendations": pdf_recommendations,
     "flavor_balance_index": flavor_balance_index,
     "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p")
 })
+
 
             else:
                 # Fallback if master engine not available
