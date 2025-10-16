@@ -1,10 +1,11 @@
 fastapi
 uvicorn
 jinja2
-aiofiles
+requests
+python-multipart
+python-dateutil
 pydantic
+aiofiles
 requests
 itsdangerous
 email-validator
-python-multipart
-python-dateutil
