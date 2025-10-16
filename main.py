@@ -487,6 +487,51 @@ def log_shutdown_message():
     print(f"🛑  {APP_NAME} shutting down gracefully at {shutdown_time}")
     print(f"🧩  All services closed cleanly. See logs for details.")
     print("-"*70 + "\n")
+# ---- FREEMIUM ACCESS CONTROL ----
+import os
+from fastapi.responses import JSONResponse
+
+GHL_API_KEY = os.getenv("GHL_API_KEY")
+
+@app.post("/freemium-check")
+async def freemium_check(request: Request):
+    """Control logic: one free plan per user"""
+    data = await request.json()
+    email = data.get("email")
+    name = data.get("name", "Friend")
+
+    if not email:
+        return JSONResponse(status_code=400, content={"error": "Email required"})
+
+    try:
+        contact = lookup_contact(email)
+        if contact is None:
+            # new user — create contact and tag
+            new_contact = create_contact(email, name)
+            if new_contact:
+                add_tag_to_contact(new_contact["id"], "Freemium-Used")
+                send_admin_notification(email, "3-Day Free", "new")
+                email_body = get_free_plan_email(name)
+                send_email(email, "Your FREE 3-Day Flavor Reset Plan", email_body)
+                return {"status": "ok", "message": "Free plan granted"}
+
+        else:
+            # returning user
+            if has_freemium_tag(contact):
+                # already used
+                email_body = get_upsell_email(name)
+                send_email(email, "Upgrade Your Flavor Reset Plan", email_body)
+                return {"status": "blocked", "message": "Free plan already used"}
+            else:
+                # returning user without tag
+                add_tag_to_contact(contact["id"], "Freemium-Used")
+                email_body = get_free_plan_email(name)
+                send_email(email, "Your FREE 3-Day Flavor Reset Plan", email_body)
+                return {"status": "ok", "message": "Free plan granted (returning user)"}
+
+    except Exception as e:
+        logger.error(f"Freemium check failed: {e}", exc_info=True)
+        return JSONResponse(status_code=500, content={"error": "Server error"})
 
 # Register the shutdown handler
 atexit.register(log_shutdown_message)
