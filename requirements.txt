@@ -6,6 +6,5 @@ python-multipart
 python-dateutil
 pydantic
 aiofiles
-requests
 itsdangerous
 email-validator
