@@ -1,256 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <title>AskWelFore | Your Flavor-First Wellness Blueprint</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Your WelFore Personalized Plan</title>
+  <meta name="description" content="Your Flavor-First Wellness Blueprint — a joyful, balanced plan powered by flavor, fiber, and family wellness." />
+  <meta name="robots" content="noindex" />
   <style>
     :root{
-      --bg1:#667eea; --bg2:#764ba2;
-      --ink:#2d3748; --muted:#4a5568; --soft:#f7fafc; --card:#ffffff;
-      --accent:#6157f8; --accent2:#f5576c; --ok:#48bb78; --shadow:0 20px 60px rgba(0,0,0,.20);
+      --brand1:#667eea;--brand2:#764ba2;
+      --ink:#1e293b;--muted:#475569;
+      --panel:#f8fafc;--card:#fff;
+      --ring:#a78bfa;--ok:#10b981;--accent:#f59e0b;
     }
     *{box-sizing:border-box}
     body{
-      margin:0; padding:20px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;
-      background:linear-gradient(135deg,var(--bg1) 0%, var(--bg2) 100%); min-height:100vh;
+      margin:0;padding:24px;
+      font-family:Inter,-apple-system,Segoe UI,Roboto,Helvetica,sans-serif;
+      background:linear-gradient(135deg,var(--brand1),var(--brand2));
+      color:var(--ink);
+      min-height:100vh;
     }
-    .container{max-width:900px; margin:0 auto; background:var(--card); border-radius:16px; padding:28px; box-shadow:var(--shadow)}
-    .brand{
-      display:flex; align-items:center; gap:12px; margin-bottom:8px; justify-content:center;
+    .container{
+      max-width:980px;margin:0 auto;
+      background:var(--card);border-radius:20px;
+      padding:36px;box-shadow:0 30px 80px rgba(0,0,0,.25);
     }
-    .brand img{height:44px; width:auto}
-    .badge{display:inline-block; background:#eef2ff; color:#4338ca; padding:6px 10px; border-radius:999px; font-size:.85rem; font-weight:700}
-    .header{ text-align:center; margin:16px 0 22px}
-    .header h1{color:var(--ink); font-size:1.9rem; margin:.2rem 0}
-    .header p{color:var(--muted); line-height:1.55}
-    /* Flavor Balance Index */
-    .fbi{
-      background:linear-gradient(135deg,#e0f7fa,#f1f8e9); border-radius:14px; padding:22px; text-align:center; margin:20px 0 26px;
-      box-shadow:0 8px 18px rgba(0,0,0,.06)
+    .top{display:flex;gap:14px;align-items:center;justify-content:center;text-align:center;margin-bottom:8px}
+    .top img{height:52px;width:auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.15))}
+    .sub{color:#334155;font-weight:600}
+    .hero{text-align:center;margin:16px 0 24px}
+    .hero h1{margin:0;font-size:clamp(1.5rem,3vw,2.2rem)}
+    .hero p{color:var(--muted)}
+    .index{
+      background:linear-gradient(135deg,#e0f7fa,#f1f8e9);
+      border-radius:16px;text-align:center;padding:22px;margin:22px 0;
+      box-shadow:0 8px 18px rgba(0,0,0,.08);border:1px solid #d1fae5;
     }
-    .fbi h2{margin:0 0 6px; color:#2b6cb0; font-size:1.25rem}
-    .fbi .score{font-size:2.6rem; font-weight:800; color:#2b6cb0}
-    .fbi p{margin:8px 0 0; color:#234e70}
-    /* Upsell */
-    .upsell{
-      background:linear-gradient(135deg,#f093fb 0%, var(--accent2) 100%); color:#fff; border-radius:14px; padding:20px; text-align:center; margin:10px 0 26px;
+    .index .score{font-size:2.8rem;font-weight:800;color:#1e3a8a;margin:4px 0}
+    .index small{color:#065f46;font-weight:600}
+    .grid{
+      display:grid;gap:18px;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      margin-bottom:28px;
     }
-    .upsell h3{margin:0 0 6px; font-size:1.25rem}
-    .btn{
-      display:inline-block; text-decoration:none; font-weight:700; padding:12px 20px; border-radius:10px; margin-top:10px; background:#fff; color:#f5576c;
-      transition:transform .15s ease
+    .panel{background:var(--panel);border-radius:14px;padding:16px;border-left:4px solid var(--brand1)}
+    .panel h3{margin:0 0 10px;font-size:1.05rem}
+    .kv div{
+      background:#fff;margin:4px 0;padding:8px 10px;
+      border-radius:8px;border-left:3px solid var(--ring);
+      font-size:.95rem;line-height:1.4;
     }
-    .btn:hover{transform:translateY(-2px)}
-    /* Summary grid */
-    .summary{background:var(--soft); border-radius:14px; padding:16px; margin:0 0 24px}
-    .summary h3{margin:0 0 10px; color:var(--ink)}
-    .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px}
-    .info{background:#fff; border-left:3px solid var(--accent); border-radius:10px; padding:10px 12px}
-    .label{font-size:.82rem; color:#718096}
-    .value{font-weight:700; color:var(--ink)}
-    /* Days */
-    .days h3{color:var(--ink); margin:6px 0 14px}
-    details.day{background:var(--soft); border-radius:14px; margin:0 0 14px; border-left:4px solid var(--accent); overflow:hidden}
-    summary{
-      list-style:none; cursor:pointer; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    .day{
+      background:var(--panel);border-radius:16px;padding:18px;border:1px solid #e5e7eb;margin:14px 0;
     }
-    summary::-webkit-details-marker{display:none}
-    .day-title{font-weight:800; color:#4c51bf}
-    .day-sub{color:#5a677a; font-size:.95rem}
-    .content{padding:0 16px 16px}
-    .section{background:#fff; border-radius:10px; padding:12px; margin:10px 0}
-    .section h4{margin:0 0 6px; color:#334155; font-size:1rem}
-    .meal{color:#4a5568}
-    .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
-    .chip{padding:4px 10px; border-radius:999px; font-weight:700; font-size:.8rem}
-    .red{background:#fed7d7; color:#c53030}
-    .orange{background:#feebc8; color:#c05621}
-    .yellow{background:#fefcbf; color:#975a16}
-    .green{background:#c6f6d5; color:#22543d}
-    .purple{background:#e9d8fd; color:#553c9a}
-    .white{background:#e2e8f0; color:#2d3748}
-    .count{font-weight:800; color:#4c51bf}
-    /* PDFs */
-    .pdfs{background:var(--soft); border-radius:14px; padding:16px; margin:18px 0}
-    .pdf{background:#fff; border-left:3px solid var(--ok); border-radius:10px; padding:12px; margin:10px 0}
-    .pdf h4{margin:0 0 4px; color:var(--ink)}
-    .pdf p{margin:0; color:#5f6b7a}
-    /* Flavor boosts footer */
-    .boosts{background:linear-gradient(135deg,#fff7ed,#fef3c7); border-radius:16px; padding:18px; margin:22px 0; text-align:center}
-    .boosts h3{margin:0 0 8px; color:#9a3412}
-    .boosts p{margin:0; color:#78350f}
-    /* Footer */
-    .foot{margin-top:18px; text-align:center; font-size:.85rem; color:#6b7280}
-    @media (min-width:760px){
-      summary{padding:16px 18px}
-      .content{padding:0 18px 18px}
+    .day h4{margin:0 0 8px;color:var(--brand1)}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    .badge{background:#eef2ff;color:#4338ca;font-weight:700;border-radius:999px;padding:6px 10px;font-size:.8rem}
+    .meal{background:#fff;border-radius:10px;padding:10px;margin:6px 0;border:1px solid #f1f5f9}
+    .snack-card{
+      background:linear-gradient(135deg,#fff7ed,#fffbeb);
+      border:1px solid #fed7aa;color:#7c2d12;
+      border-radius:14px;padding:14px;margin:10px 0;font-weight:500;
     }
+    .hydro{
+      background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;
+      border-radius:14px;padding:14px;margin:10px 0;
+    }
+    .colors{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .c{padding:4px 10px;border-radius:999px;font-weight:700;font-size:.75rem}
+    .c.red{background:#fee2e2;color:#b91c1c}
+    .c.orange{background:#ffedd5;color:#c2410c}
+    .c.yellow{background:#fef9c3;color:#92400e}
+    .c.green{background:#dcfce7;color:#166534}
+    .c.purple{background:#ede9fe;color:#6d28d9}
+    .c.white{background:#e2e8f0;color:#111827}
+    .boosts{
+      background:linear-gradient(135deg,#fff7ed,#fde68a);
+      border:1px solid #fbbf24;
+      color:#78350f;
+      border-radius:14px;padding:20px;margin:26px 0;text-align:center;
+      line-height:1.6;font-size:1rem;
+    }
+    .boosts h3{margin-bottom:8px;color:#92400e}
+    .cta{text-align:center;margin:28px 0}
+    .btn{text-decoration:none;padding:12px 24px;border-radius:10px;font-weight:800}
+    .btn.primary{background:linear-gradient(135deg,var(--brand1),var(--brand2));color:#fff}
+    footer{margin-top:24px;padding-top:18px;border-top:1px dashed #e5e7eb;color:#475569;font-size:.9rem}
+    footer .cred{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    footer img{height:38px;width:auto}
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Brand -->
-    <div class="brand">
-      <img src="/static/WelFore-Health-logo.png" alt="WelFore Health" />
-      <span class="badge">Digital Health Hub Global Finalist • Wellness & Prevention 2025</span>
-    </div>
+<div class="container">
+  <!-- Brand -->
+  <div class="top">
+    <img src="/static/WelFore-Health-logo.png" alt="WelFore Health" />
+    <div class="sub">Flavor-First • Eat the Rainbow • Family Wellness</div>
+  </div>
 
-    <!-- Header -->
-    <div class="header">
-      <h1>🌈 Your Personalized Wellness Plan</h1>
-      <p><strong>{{ meal_plan.user_name }}</strong>, here’s your flavor-forward plan designed to reach your <strong>{{ meal_plan.health_goal }}</strong> goal—without giving up the foods you love.</p>
-    </div>
+  <!-- Hero -->
+  <div class="hero">
+    <h1>🌈 Your Flavor-First Wellness Blueprint</h1>
+    <p><strong>{{ meal_plan.user_name or 'Friend' }}</strong>, here’s your joyful, balanced plan—powered by flavor, fiber, and feel-good food.</p>
+  </div>
 
-    <!-- Flavor Balance Index -->
-    {% if flavor_balance_index %}
-    <div class="fbi">
-      <h2>🌿 Your Flavor Balance Index</h2>
-      <div class="score">{{ flavor_balance_index }}/100</div>
+  <!-- Index -->
+  <div class="index">
+    <h2>🌿 Flavor Balance Index</h2>
+    <div class="score">{{ flavor_balance_index }}/100</div>
+    <small>
       {% if flavor_balance_index >= 90 %}
-        <p>🔥 Incredible! Balanced colors & flavors like a pro chef.</p>
+        🔥 Incredible! You’re balancing flavor and nutrition like a pro.
       {% elif flavor_balance_index >= 80 %}
-        <p>🌿 Great work—today’s plates are vibrant and confident.</p>
+        🌿 Great job — vibrant, nutrient-balanced meals all around!
       {% else %}
-        <p>🌈 You’re off to a delicious start—add one more color tomorrow for a boost.</p>
+        🌈 You’re off to a delicious start — add one more color tomorrow to boost your score.
       {% endif %}
-    </div>
-    {% endif %}
+    </small>
+  </div>
 
-    <!-- Upsell (freemium-safe): show if a longer plan is available -->
-    {% if meal_plan.stripe_link and meal_plan.plan_duration < 7 %}
-    <div class="upsell">
-      <h3>✨ Ready for the Full Reset?</h3>
-      <p>Unlock the complete {{ 7 if meal_plan.plan_duration < 7 else meal_plan.plan_duration }}-day FlavURWay plan with shopping lists, tips & momentum boosters.</p>
-      <a class="btn" href="{{ meal_plan.stripe_link }}" target="_blank" rel="noopener">Upgrade to Premium →</a>
-    </div>
-    {% endif %}
-
-    <!-- Summary -->
-    <div class="summary">
+  <!-- Overview -->
+  <div class="grid">
+    <div class="panel">
       <h3>📋 Plan Overview</h3>
-      <div class="grid">
-        <div class="info"><div class="label">Duration</div><div class="value">{{ meal_plan.plan_duration }} days</div></div>
-        <div class="info"><div class="label">Primary Cuisine</div><div class="value">{{ meal_plan.primary_cuisine }}</div></div>
-        <div class="info"><div class="label">Avg Colors / Day</div><div class="value">{{ meal_plan.average_colors_per_day }}</div></div>
-        <div class="info"><div class="label">Daily Protein</div><div class="value">{{ meal_plan.nutrition_targets.protein_daily }}</div></div>
-        <div class="info"><div class="label">Daily Fiber</div><div class="value">{{ meal_plan.nutrition_targets.fiber_daily }}</div></div>
-        <div class="info"><div class="label">Hydration Goal</div><div class="value">{{ meal_plan.nutrition_targets.hydration }}</div></div>
+      <div class="kv">
+        <div><strong>Duration:</strong> {{ meal_plan.plan_duration or '3 Days' }}</div>
+        <div><strong>Colors/Day:</strong> {{ meal_plan.average_colors_per_day or '5–6' }}</div>
+        <div><strong>Cuisine:</strong> {{ meal_plan.primary_cuisine or 'Caribbean + Mediterranean' }}</div>
+        <div><strong>Fiber:</strong> {{ meal_plan.nutrition_targets.fiber_daily or '20–25g/day' }}</div>
+        <div><strong>Protein:</strong> {{ meal_plan.nutrition_targets.protein_daily or '60–80g/day' }}</div>
+        <div><strong>Hydration:</strong> {{ meal_plan.nutrition_targets.hydration or '8–10 glasses' }}</div>
       </div>
     </div>
 
-    <!-- Days -->
-    <div class="days">
-      <h3>🍽️ Your Daily Meal Plan</h3>
-
-      {% set themes = [
-        'Heritage Harmony — familiar flavors, bright colors.',
-        'Light & Balanced — crisp, fresh, energizing.',
-        'Comfort & Color — warm plates with brightness.',
-        'Family Favorites — simple, satisfying, joyful.',
-        'Fresh & Fiber-Filled — color + crunch.',
-        'Caribbean Bright — tangy, sunny, vibrant.'
-      ] %}
-
-      {% for day in meal_plan.meal_plan %}
-      {% set theme = themes[(loop.index0) % themes|length] %}
-      <details class="day" {% if loop.first %}open{% endif %}>
-        <summary>
-          <div>
-            <div class="day-title">Day {{ day.day }} • {{ theme }}</div>
-            <div class="day-sub">Colors: <span class="count">{{ day.colors_achieved }}</span></div>
-          </div>
-          <div aria-hidden="true">▼</div>
-        </summary>
-        <div class="content">
-
-          {# Build structured sections from the free-form meal strings #}
-          {% set ns = namespace(breakfast='', lunch='', dinner='', snacks=[], hydration='', goals='') %}
-          {% for m in day.meals %}
-            {% if 'Breakfast:' in m %}{% set ns.breakfast = m.split('Breakfast:')[1].strip() %}
-            {% elif 'Lunch:' in m %}{% set ns.lunch = m.split('Lunch:')[1].strip() %}
-            {% elif 'Dinner:' in m %}{% set ns.dinner = m.split('Dinner:')[1].strip() %}
-            {% elif 'Snack:' in m %}{% set _ = ns.snacks.append(m.split('Snack:')[1].strip()) %}
-            {% elif 'Hydration:' in m %}{% set ns.hydration = m.split('Hydration:')[1].strip() %}
-            {% elif 'Daily Goals:' in m %}{% set ns.goals = m.split('Daily Goals:')[1].strip() %}
-            {% endif %}
-          {% endfor %}
-
-          <div class="section">
-            <h4>Breakfast</h4>
-            <div class="meal">{{ ns.breakfast or 'Chef’s choice: colorful, protein-forward start' }}</div>
-          </div>
-          <div class="section">
-            <h4>Lunch</h4>
-            <div class="meal">{{ ns.lunch or 'Greens + lean protein + whole grains' }}</div>
-          </div>
-          <div class="section">
-            <h4>Dinner</h4>
-            <div class="meal">{{ ns.dinner or 'Vegetable-forward, sauce on the side, rainbow sides' }}</div>
-          </div>
-          <div class="section">
-            <h4>Snack Smart</h4>
-            {% if ns.snacks|length > 0 %}
-              {% for s in ns.snacks %}
-                <div class="meal">• {{ s }}</div>
-              {% endfor %}
-            {% else %}
-              <div class="meal">Protein + Color/Grain: e.g., cottage cheese + pineapple • hummus + carrots • cheese + whole-grain crackers</div>
-            {% endif %}
-          </div>
-          <div class="section">
-            <h4>Hydration Boost</h4>
-            <div class="meal">{{ ns.hydration or 'Drink 8–10 glasses water; add herbal tea or citrus-infused water.' }}</div>
-          </div>
-          <div class="section">
-            <h4>Daily Targets</h4>
-            <div class="meal">{{ ns.goals or (meal_plan.nutrition_targets.fiber_daily ~ ', ' ~ meal_plan.nutrition_targets.protein_daily) }}</div>
-          </div>
-
-          <div class="section">
-            <h4>Color Palette</h4>
-            <div class="chips">
-              {% for c in day.colors %}
-                {% set cls = 'white' %}
-                {% if c == 'red' %}{% set cls='red' %}
-                {% elif c == 'orange' %}{% set cls='orange' %}
-                {% elif c == 'yellow' %}{% set cls='yellow' %}
-                {% elif c == 'green' %}{% set cls='green' %}
-                {% elif 'purple' in c or 'blue' in c %}{% set cls='purple' %}
-                {% endif %}
-                <span class="chip {{ cls }}">{{ c }}</span>
-              {% endfor %}
-            </div>
-          </div>
-
-        </div>
-      </details>
-      {% endfor %}
-    </div>
-
-    <!-- PDFs -->
-    {% if pdf_recommendations %}
-    <div class="pdfs">
-      <h3>📚 Recommended Guides</h3>
-      {% for pdf in pdf_recommendations %}
-        <div class="pdf">
-          <h4>{{ pdf.title }}</h4>
-          <p>{{ pdf.description or 'Helpful companion for your reset.' }}</p>
-        </div>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- Flavor Boosts Footer -->
-    <div class="boosts">
-      <h3>🌿 Flavor Boost Tips</h3>
-      <p>Brighten fish with lemon zest • Lift tomato dishes with basil • Warm breakfasts with cinnamon or cardamom • Add crunch with toasted seeds.</p>
-    </div>
-
-    <!-- Footer -->
-    <div class="foot">
-      © 2025 WelFore Health LLC. All Rights Reserved. • Powered by the FlavURWay Teaching Kitchen Collective.
+    <div class="panel">
+      <h3>🎯 Your Focus</h3>
+      <div class="kv">
+        <div><strong>Goal:</strong> {{ meal_plan.health_goal or 'Heart-happy energy & steady blood sugar' }}</div>
+        <div><strong>Style:</strong> {{ meal_plan.style or 'Flavor-forward, easy prep, family-friendly' }}</div>
+        <div><strong>Tools:</strong> {{ meal_plan.tools or 'Stove • Oven • Air Fryer' }}</div>
+        <div><strong>Snack Rule:</strong> Protein + Color</div>
+      </div>
     </div>
   </div>
+
+  <!-- Daily Plans -->
+  {% for day in meal_plan.meal_plan %}
+    <div class="day">
+      <h4>Day {{ day.day }} • {{ day.theme }}</h4>
+      <div class="meta">
+        <span class="badge">Colors: {{ day.colors_achieved }}</span>
+        <span class="badge">Balanced Plates</span>
+      </div>
+      {% for meal in day.meals %}
+        {% if 'Snack' in meal %}
+          <div class="snack-card">{{ meal }}</div>
+        {% elif 'Hydration' in meal %}
+          <div class="hydro">{{ meal }}</div>
+        {% else %}
+          <div class="meal">{{ meal }}</div>
+        {% endif %}
+      {% endfor %}
+      <div class="colors">
+        {% for color in day.colors %}
+          <span class="c {{ color }}">{{ color }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+
+  <!-- CTA -->
+  {% if not meal_plan.is_premium %}
+  <div class="cta">
+    <a class="btn primary" href="{{ meal_plan.stripe_link or '#' }}">Upgrade to 7-Day Premium →</a>
+  </div>
+  {% endif %}
+
+  <!-- Flavor Boost -->
+  <div class="boosts">
+    <h3>🌿 Flavor Boost Tips</h3>
+    <p>Brighten fish with lemon zest • Lift tomato dishes with basil • Add warmth with turmeric or ginger • Finish veggies with toasted seeds.</p>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="cred">
+      <img src="/static/WelFore-Health-logo.png" alt="WelFore Health" />
+      <div>
+        <strong>WelFore Health</strong> • Flavor-first Food-as-Medicine<br>
+        🏆 Global Rising Star Finalist • Digital Health Hub Awards 2025<br>
+        Powered by Precise Portions — supporting 500,000+ families.
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      © 2025 WelFore Health LLC • Educational only • Not a substitute for medical advice.
+    </div>
+  </footer>
+</div>
 </body>
 </html>
