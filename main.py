@@ -74,7 +74,7 @@ required_packages = [
 
 missing = []
 for pkg in required_packages:
-    if importlib.util.find_spec(pkg) is None:
+    if importlib.util.find_spec(pkg) is None and pkg not in sys.modules:
         missing.append(pkg)
 
 if missing:
