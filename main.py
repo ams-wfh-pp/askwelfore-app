@@ -329,52 +329,6 @@ if HAS_MULTIPART:
             # Freemium control logic
             is_premium = plan_duration > 3
             
-# ------------------------------
-# Handle 6-step quiz form submission
-# ------------------------------
-try:
-    logger.info(f"Quiz submitted: {{'name': '{name}', 'email': '{email}'}}")
-
-    # Generate meal plan using master engine
-    if HAS_MASTER_ENGINE:
-        meal_plan = generate_enhanced_meal_plan(user_profile)
-        pdf_recommendations = get_enhanced_recommended_pdfs(user_profile)
-        flavor_balance_index = calculate_nutrition_score(meal_plan)
-
-        # Add freemium messaging
-        if is_premium:
-            meal_plan["is_premium"] = True
-            meal_plan["premium_message"] = "✨ Unlock your full 7-day plan with WelFore Premium!"
-            meal_plan["stripe_link"] = STRIPE_7DAY_LINK if plan_duration == 7 else STRIPE_14DAY_LINK
-        else:
-            meal_plan["is_premium"] = False
-
-        return templates.TemplateResponse("results.html", {
-            "request": request,
-            "meal_plan": meal_plan,
-            "pdf_recommendations": pdf_recommendations,
-            "flavor_balance_index": flavor_balance_index,
-            "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p")
-        })
-
-    else:
-        # Fallback if master engine not available
-        return templates.TemplateResponse("results.html", {
-            "request": request,
-            "error": True,
-            "error_message": "Meal plan generation is temporarily unavailable. Please try again later.",
-            "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p")
-        })
-
-except Exception as e:
-    logger.error(f"Error processing quiz submission: {str(e)}", exc_info=True)
-    return templates.TemplateResponse("results.html", {
-        "request": request,
-        "error": True,
-        "error_message": "We encountered an issue processing your request. Please try again.",
-        "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p")
-    })
-
     
     print("✅ Form submission endpoint registered")
 else:
