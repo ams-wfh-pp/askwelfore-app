@@ -329,7 +329,7 @@ if HAS_MULTIPART:
             # Freemium control logic
             is_premium = plan_duration > 3
             
-            try:
+try:
     logger.info(f"Quiz submitted: {{'name': '{name}', 'email': '{email}'}}")
 
     # Generate meal plan using master engine
@@ -371,6 +371,7 @@ except Exception as e:
         "error_message": "We encountered an issue processing your request. Please try again.",
         "generated_at": datetime.now().strftime("%B %d, %Y at %I:%M %p")
     })
+
 
     
     print("✅ Form submission endpoint registered")
