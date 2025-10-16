@@ -20,9 +20,11 @@
       padding: 40px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
+
+    /* Header & Award Section */
     .award-banner { text-align: center; margin-bottom: 25px; }
-    .award-banner img { max-width: 220px; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2)); }
-    .award-caption { font-size: 0.95rem; color: #4a5568; font-weight: 600; margin-top: 8px; }
+    .award-banner img { max-width: 200px; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2)); }
+    .award-caption { font-size: 1rem; color: #4a5568; font-weight: 600; margin-top: 8px; }
 
     .header { text-align: center; margin-bottom: 30px; }
     .header h1 { color: #2d3748; font-size: 2rem; margin-bottom: 10px; }
@@ -37,23 +39,11 @@
       margin-bottom: 30px;
       box-shadow: 0 6px 12px rgba(0,0,0,0.08);
     }
-    .flavor-index-box h2 {
-      color: #2b6cb0;
-      font-weight: 700;
-      font-size: 1.8em;
-      margin-bottom: 10px;
-    }
-    .flavor-index-box .score {
-      font-size: 3rem;
-      color: #2b6cb0;
-      font-weight: 800;
-    }
-    .flavor-index-box p {
-      color: #333;
-      margin-top: 10px;
-      font-size: 1.05rem;
-    }
+    .flavor-index-box h2 { color: #2b6cb0; font-weight: 700; font-size: 1.8em; margin-bottom: 10px; }
+    .flavor-index-box .score { font-size: 3rem; color: #2b6cb0; font-weight: 800; }
+    .flavor-index-box p { color: #333; margin-top: 10px; font-size: 1.05rem; }
 
+    /* Upsell */
     .premium-upsell {
       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       color: white;
@@ -76,6 +66,7 @@
     }
     .premium-upsell a:hover { transform: translateY(-2px); }
 
+    /* Plan Overview */
     .plan-summary {
       background: #f7fafc;
       padding: 20px;
@@ -83,7 +74,7 @@
       margin-bottom: 30px;
     }
     .plan-summary h3 { color: #2d3748; margin-bottom: 15px; }
-    .plan-summary .info-grid {
+    .info-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
@@ -97,6 +88,18 @@
     .info-label { font-size: 0.85rem; color: #718096; margin-bottom: 4px; }
     .info-value { color: #2d3748; font-weight: 600; }
 
+    /* Hydration Tip */
+    .hydration-tip {
+      background:#ebf8ff;
+      padding:15px;
+      border-radius:12px;
+      text-align:center;
+      margin-bottom:25px;
+      color:#2b6cb0;
+      font-weight:600;
+    }
+
+    /* Meal Plan */
     .meal-plan { margin-bottom: 30px; }
     .meal-plan h3 { color: #2d3748; margin-bottom: 20px; font-size: 1.5rem; }
     .day-card {
@@ -115,6 +118,7 @@
       color: #4a5568;
     }
 
+    /* Color Badges */
     .color-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
     .color-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
     .color-badge.red { background: #fed7d7; color: #c53030; }
@@ -124,6 +128,18 @@
     .color-badge.blue-purple { background: #e9d8fd; color: #553c9a; }
     .color-badge.white { background: #e2e8f0; color: #2d3748; }
 
+    /* Snack + Flavor Boost */
+    .snack-tip, .flavor-boost {
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .snack-tip { background:#edf2f7; color:#2d3748; }
+    .flavor-boost { background:#fff7ed; color:#78350f; }
+
+    /* PDF Recommendations */
     .pdf-recommendations {
       background: #f7fafc;
       padding: 20px;
@@ -137,26 +153,8 @@
       border-radius: 8px;
       border-left: 3px solid #48bb78;
     }
-    .pdf-item h4 { color: #2d3748; margin-bottom: 5px; font-size: 1.1rem; }
-    .pdf-item p { color: #718096; font-size: 0.95rem; }
 
-    .error {
-      background: #fed7d7;
-      border-left: 4px solid #fc8181;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .error h2 { color: #c53030; margin-bottom: 10px; }
-    .error p { color: #742a2a; }
-
-    .timestamp {
-      text-align: center;
-      color: #718096;
-      font-size: 0.9rem;
-      margin-top: 30px;
-    }
-
+    /* Buttons */
     .cta-buttons {
       display: flex;
       gap: 15px;
@@ -180,47 +178,60 @@
       background: #e2e8f0;
       color: #2d3748;
     }
+
+    footer {
+      text-align:center;
+      margin-top:40px;
+      color:#718096;
+      font-size:0.85rem;
+    }
+    footer img {
+      max-width:120px;
+      display:block;
+      margin:0 auto 10px;
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="award-banner">
-      <img src="/static/WELFORE.png" alt="Digital Health Hub Rising Star Finalist 2025 - WelFore Health" />
-      <p class="award-caption">🏆 Recognized Globally for Innovation in Wellness & Prevention</p>
+      <img src="/static/WelFore-Health-logo.png" alt="WelFore Health Logo" />
+      <p class="award-caption">Flavor-First • Eat the Rainbow • Culturally Inclusive Wellness</p>
     </div>
 
     {% if error %}
-      <div class="error">
-        <h2>Oops! Something went wrong.</h2>
-        <p>{{ error_message }}</p>
-      </div>
+    <div class="error">
+      <h2>Oops! Something went wrong.</h2>
+      <p>{{ error_message }}</p>
+    </div>
     {% else %}
 
     <div class="header">
-      <h1>🌈 Your Personalized Wellness Plan</h1>
-      <p><strong>{{ meal_plan.user_name }}</strong>, here’s your flavor-forward, culturally attuned plan to help you reach your <strong>{{ meal_plan.health_goal }}</strong> goal!</p>
+      <h1>🌈 Your Flavor-Full Wellness Plan</h1>
+      <p><strong>{{ meal_plan.user_name }}</strong>, here’s your personalized, flavor-forward journey — balanced by color, culture, and joy. Let’s make healthy eating stick, one delicious day at a time!</p>
     </div>
 
     {% if flavor_balance_index %}
-      <div class="flavor-index-box">
-        <h2>🌿 Your Flavor Balance Index</h2>
-        <div class="score">{{ flavor_balance_index }}/100</div>
-        {% if flavor_balance_index >= 90 %}
-          <p>🔥 Incredible! You’re balancing flavor and nutrition like a pro chef.</p>
-        {% elif flavor_balance_index >= 80 %}
-          <p>🌿 Great work — your meals are bursting with color and confidence!</p>
-        {% else %}
-          <p>🌈 You’re off to a delicious start! Add one more color tomorrow to boost your index.</p>
-        {% endif %}
-      </div>
+    <div class="flavor-index-box">
+      <h2>🌿 Your Flavor Balance Index</h2>
+      <div class="score">{{ flavor_balance_index }}/100</div>
+      {% if flavor_balance_index >= 90 %}
+        <p>🔥 Incredible! You’re balancing flavor and nutrition like a pro chef.</p>
+      {% elif flavor_balance_index >= 80 %}
+        <p>🌿 Great work — your meals are bursting with color and confidence!</p>
+      {% else %}
+        <p>🌈 You’re off to a delicious start! Add one more color tomorrow to boost your index.</p>
+      {% endif %}
+    </div>
     {% endif %}
 
     {% if meal_plan.is_premium %}
-      <div class="premium-upsell">
-        <h3>{{ meal_plan.premium_message }}</h3>
-        <p>You've selected a {{ meal_plan.plan_duration }}-day plan. Unlock the full experience with our premium subscription!</p>
-        <a href="{{ meal_plan.stripe_link }}" target="_blank">Upgrade Now →</a>
-      </div>
+    <div class="premium-upsell">
+      <h3>{{ meal_plan.premium_message }}</h3>
+      <p>You've selected a {{ meal_plan.plan_duration }}-day plan. Unlock the full experience with our premium subscription!</p>
+      <a href="{{ meal_plan.stripe_link }}" target="_blank">Upgrade Now →</a>
+    </div>
     {% endif %}
 
     <div class="plan-summary">
@@ -235,65 +246,65 @@
       </div>
     </div>
 
+    <div class="hydration-tip">💧 Hydration Highlight: {{ meal_plan.nutrition_targets.hydration }} per day — flavor it with lemon, mint, or cucumber!</div>
+
     <div class="meal-plan">
       <h3>🍽️ Your Daily Meal Plan</h3>
       {% for day in meal_plan.meal_plan %}
-        <div class="day-card">
-          <h4>Day {{ day.day }} - {{ day.colors_achieved }} Colors Achieved 🌈</h4>
-          {% for meal in day.meals %}
-            <div class="meal-item">{{ meal }}</div>
+      <div class="day-card">
+        <h4>Day {{ day.day }} - {{ day.colors_achieved }} Colors Achieved 🌈</h4>
+        {% for meal in day.meals %}
+          <div class="meal-item">{{ meal }}</div>
+        {% endfor %}
+        <div class="color-badges">
+          {% for color in day.colors %}
+            <span class="color-badge {{ color }}">{{ color }}</span>
           {% endfor %}
-          <div class="color-badges">
-            {% for color in day.colors %}
-              <span class="color-badge {{ color }}">{{ color }}</span>
-            {% endfor %}
-          </div>
         </div>
+      </div>
       {% endfor %}
     </div>
 
+    <div class="snack-tip">
+      <h3>🥪 Snack Smart</h3>
+      <p>Mid-morning & mid-afternoon snacks keep your energy stable. Aim for <strong>1 Protein + 1 Color or Whole-Grain</strong> combo — like yogurt with berries or hummus with carrots.</p>
+    </div>
+
+    <div class="flavor-boost">
+      <h3>🌿 Flavor Boost</h3>
+      <p>Enhance dinners with fresh herbs: <strong>Basil</strong> for Mediterranean, <strong>Cilantro</strong> for Latin dishes, <strong>Thyme</strong> for Caribbean, <strong>Ginger</strong> for Asian flavors.</p>
+    </div>
+
     {% if pdf_recommendations %}
-      <div class="pdf-recommendations">
-        <h3>📚 Recommended Wellness Guides</h3>
-        {% for pdf in pdf_recommendations %}
-          <div class="pdf-item">
-            <h4>{{ pdf.title }}</h4>
-            <p>{{ pdf.description }}</p>
-          </div>
-        {% endfor %}
-      </div>
+    <div class="pdf-recommendations">
+      <h3>📚 Recommended Wellness Guides</h3>
+      {% for pdf in pdf_recommendations %}
+        <div class="pdf-item">
+          <h4>{{ pdf.title }}</h4>
+          <p>{{ pdf.description }}</p>
+        </div>
+      {% endfor %}
+    </div>
     {% endif %}
 
     <div class="cta-buttons">
       <a href="/" class="cta-btn secondary">← Take Quiz Again</a>
       {% if not meal_plan.is_premium %}
-        <a href="{{ meal_plan.stripe_link or '#' }}" class="cta-btn primary">Upgrade to Premium →</a>
+      <a href="{{ meal_plan.stripe_link or '#' }}" class="cta-btn primary">Upgrade to Premium →</a>
       {% endif %}
-   
-</div> <!-- end CTA buttons -->
+    </div>
 
-<!-- 🌟 Share Your Flavor Balance -->
-<div class="share-section" style="text-align:center; margin-top:50px; padding:25px; background:linear-gradient(135deg,#fff7ed,#fef3c7); border-radius:16px; box-shadow:0 6px 12px rgba(0,0,0,0.08);">
-  <h3 style="color:#9a3412; font-size:1.6em; margin-bottom:10px;">💬 Share Your Flavor Balance!</h3>
-  <p style="color:#78350f; margin-bottom:20px; font-size:1.05rem;">
-    Proud of your <strong>{{ flavor_balance_index }}/100</strong>?  
-    Inspire friends and family to eat the rainbow too.  
-  </p>
-  <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-    <a href="https://www.facebook.com/sharer/sharer.php?u=https://askwelfore.com&quote=I just unlocked my Flavor Balance Index on AskWelFore! 🌈" target="_blank" class="share-btn" style="background:#1877f2;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Share on Facebook</a>
-    <a href="https://twitter.com/intent/tweet?text=I%20just%20unlocked%20my%20Flavor%20Balance%20Index%20on%20AskWelFore!%20🌈%20Join%20me%20at%20https://askwelfore.com" target="_blank" class="share-btn" style="background:#1da1f2;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Share on X</a>
-    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://askwelfore.com" target="_blank" class="share-btn" style="background:#0077b5;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Share on LinkedIn</a>
-    <a href="mailto:?subject=Check%20out%20my%20Flavor%20Balance%20Index!&body=I%20just%20completed%20my%20Flavor%20Balance%20Index%20on%20AskWelFore.%20See%20your%20plan%20at%20https://askwelfore.com" class="share-btn" style="background:#f97316;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Share by Email</a>
+    {% if generated_at %}
+    <p class="timestamp">Generated on {{ generated_at }}</p>
+    {% endif %}
+    {% endif %}
+
+    <footer>
+      <img src="/static/WelFore-Health-logo.png" alt="WelFore Health Logo" />
+      <p>© 2025 WelFore Health LLC. All Rights Reserved.</p>
+      <p>Powered by the <strong>FlavURWay Teaching Kitchen Collective</strong>.</p>
+      <p style="margin-top:10px;font-style:italic;">This plan is for educational purposes and not a substitute for medical advice.</p>
+    </footer>
   </div>
-  <p style="margin-top:20px; color:#92400e; font-size:0.9rem;">#EatTheRainbow #FlavorFirst #WelForeHealth #AskWelFore</p>
-</div>
-
-{% if generated_at %}
-  <p class="timestamp">Generated on {{ generated_at }}</p>
-{% endif %}
-
-{% endif %}
-</div>
 </body>
 </html>
-
