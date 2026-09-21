@@ -31,8 +31,13 @@ def test_evaluation_evidence_and_counts(tmp_path, suite, count):
             return "OFFLINE FIXTURE: use the available ingredients."
         return generate
     report = evaluation.run(suite, "fake", tmp_path / "evidence", factory)
-    assert len(calls) == count
-    assert report["attempted_calls"] == count
+    # Fixed clarification turns are responses, not paid API calls.
+    expected_calls = 4 if suite == "pilot" else 14
+    assert len(calls) == expected_calls
+    assert report["attempted_calls"] == expected_calls
+    assert report["attempted_responses"] == count
+    assert sum(r["response_source"] == "clinical_gate" for r in report["results"]) == count - expected_calls
+    assert all(r["estimated_usd"] == 0 for r in report["results"] if not r["model_called"])
     assert report["unknown_cost_calls"] == 0
     assert len({str(c[2]["instructions"]) for c in calls}) == 1
     assert all(c[2]["max_output_tokens"] == 2048 for c in calls)

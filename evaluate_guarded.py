@@ -13,7 +13,7 @@ def scenarios():
     base = cases("full")
     extra = json.loads((ROOT / "tests/coach_safety_scenarios.json").read_text(encoding="utf-8"))
     by_id = {case["id"]: case for case in base + extra}
-    order = ["conflicting-guidance", "unclear-renal-electrolytes",
+    order = ["unclear-renal-electrolytes", "conflicting-guidance",
              "diabetes-medication-unclear", "allergy-substitution",
              "new-allergy-follow-up", "approval-request", "caribbean-sodium",
              "mixed-cuisine", "limited-equipment", "household-dislike", "missing-ingredient"]
@@ -22,6 +22,9 @@ def scenarios():
 def remaining_scenarios(previous, selected, model):
     from kitchen_coach import INSTRUCTIONS
     report = json.loads(previous.read_text(encoding="utf-8"))
+    from clinical_gate import VERSION
+    if report.get("gate_version") != VERSION:
+        raise ValueError("Cannot resume across clinical gate changes")
     if report["prompt_sha256"] != hashlib.sha256(INSTRUCTIONS.encode()).hexdigest():
         raise ValueError("Cannot resume after instructions changed")
     if report["scenario_sha256"] != hashlib.sha256(json.dumps(selected, sort_keys=True).encode()).hexdigest():
@@ -75,7 +78,7 @@ def main():
     if args.resume_reviewed:
         selected = remaining_scenarios(args.resume_reviewed, selected, args.model)
     count = sum(1 + bool(case.get("follow_up")) for case in selected)
-    print(f"Guarded evaluation: at most {count} calls; model {args.model}; 700 output tokens; no retries.", flush=True)
+    print(f"Guarded evaluation: at most {count} responses (gated replies make no API call); model {args.model}; 700 output tokens; no retries.", flush=True)
     if not args.live:
         print("Dry run. No key requested or API called.", flush=True)
         return

@@ -3,6 +3,7 @@ import json
 import time
 from dataclasses import dataclass
 from typing import Callable
+from clinical_gate import assess
 
 
 INSTRUCTIONS = """You are AskWelFore, a Kitchen-to-Kitchen Coach.
@@ -105,6 +106,8 @@ class ContextFull(CoachError):
 @dataclass(frozen=True)
 class CoachReply:
     text: str
+    source: str = "model"
+    safety_reason: str = ""
 
 
 class KitchenCoach:
@@ -130,6 +133,9 @@ class KitchenCoach:
         size = len((INSTRUCTIONS + json.dumps(messages, ensure_ascii=False)).encode("utf-8"))
         if size > self.MAX_INPUT_BYTES:
             raise ContextFull()
+        decision = assess(profile, history, message)
+        if decision is not None:
+            return CoachReply(decision.text, source="clinical_gate", safety_reason=decision.reason)
         answer = self.generate(INSTRUCTIONS, messages, self.max_output_tokens)
         if not isinstance(answer, str) or not answer.strip() or len(answer) > self.MAX_REPLY_CHARS:
             raise CoachUnavailable()

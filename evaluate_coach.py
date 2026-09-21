@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from kitchen_coach import INSTRUCTIONS, KitchenCoach, OpenAIResponses
+from clinical_gate import VERSION as GATE_VERSION
 
 ROOT = Path(__file__).parent
 MODEL_SETTINGS = {
@@ -54,7 +55,7 @@ def run(suite, key, output, adapter_factory=OpenAIResponses, *,
     output.mkdir(parents=True, exist_ok=False)
     report = {
         "created_utc": datetime.now(timezone.utc).isoformat(),
-        "suite": suite, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
+        "suite": suite, "gate_version": GATE_VERSION, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
         "scenario_sha256": hashlib.sha256(json.dumps(scenarios, sort_keys=True).encode()).hexdigest(),
         "max_calls": total, "max_output_tokens": max_output_tokens,
         "models": {model: MODEL_SETTINGS[model] for model in models}, "rubric": DIMENSIONS, "results": [],
@@ -79,7 +80,12 @@ def run(suite, key, output, adapter_factory=OpenAIResponses, *,
             for turn, question in enumerate(questions, 1):
                 telemetry = {}
                 adapter = adapter_factory(key, model, MODEL_SETTINGS[model]["reasoning"], telemetry.update)
-                service = KitchenCoach(adapter, max_output_tokens=max_output_tokens)
+                generation_called = False
+                def generate(*args):
+                    nonlocal generation_called
+                    generation_called = True
+                    return adapter(*args)
+                service = KitchenCoach(generate, max_output_tokens=max_output_tokens)
                 row = {"scenario": case["id"], "model_requested": model, "turn": turn,
                        "profile": profile, "prior_messages": list(history), "question": question,
                        "expectation": case["expectation"], "answer": None,
@@ -89,8 +95,10 @@ def run(suite, key, output, adapter_factory=OpenAIResponses, *,
                 start = time.monotonic()
                 attempted += 1
                 try:
-                    answer = service.respond(profile, history, question).text
-                    row.update(answer=answer, word_count=len(answer.split()), application_status="ok")
+                    reply = service.respond(profile, history, question)
+                    answer = reply.text
+                    row.update(answer=answer, word_count=len(answer.split()), application_status="ok",
+                               response_source=reply.source, safety_reason=reply.safety_reason)
                     history.extend([{"role": "user", "content": question},
                                     {"role": "assistant", "content": answer}])
                 except Exception:
@@ -99,10 +107,12 @@ def run(suite, key, output, adapter_factory=OpenAIResponses, *,
                     if telemetry.get("http_status") in (400, 401, 403, 404, 429):
                         stop = True
                 row["elapsed_seconds"] = round(time.monotonic() - start, 3)
-                row["provider"] = telemetry
-                row["estimated_usd"] = estimate_cost(telemetry.get("usage"), model)
+                row["model_called"] = generation_called
+                row["provider"] = telemetry if generation_called else {"status": "not_called"}
+                row["estimated_usd"] = estimate_cost(telemetry.get("usage"), model) if generation_called else 0.0
                 report["results"].append(row)
-                report["attempted_calls"] = attempted
+                report["attempted_responses"] = attempted
+                report["attempted_calls"] = sum(r["model_called"] for r in report["results"])
                 report["known_estimated_usd"] = round(sum(
                     r["estimated_usd"] or 0 for r in report["results"]), 8)
                 report["unknown_cost_calls"] = sum(

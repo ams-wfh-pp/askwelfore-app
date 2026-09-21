@@ -31,17 +31,20 @@ def test_all_calls_require_review_before_next(tmp_path):
     def factory(key, model, reasoning, observe):
         assert model == "gpt-4.1-mini" and reasoning == ""
         def generate(instructions, messages, limit):
-            assert len(calls) == len(reviews)
+            assert not calls or reviews[-1]["evidence"] == "fixture_reviewed"
             calls.append(messages)
             return "OFFLINE FIXTURE ONLY"
         return generate
     def review(row):
+        row["evidence"] = "fixture_reviewed"
         reviews.append(row)
         return True
     report = run("revised", "fake", tmp_path / "evidence", factory,
                  models=["gpt-4.1-mini"], scenarios=guarded.scenarios(),
                  review=review, max_output_tokens=700)
-    assert len(calls) == len(reviews) == 16
+    assert len(calls) == 8
+    assert len(reviews) == 16
+    assert report["attempted_calls"] == 8
     assert not report["stopped_early"]
 
 @pytest.mark.parametrize("change", [
@@ -72,11 +75,13 @@ def test_api_failure_stops_before_review_and_next_call(tmp_path):
 def test_resume_skips_only_completed_reviewed_cases(tmp_path):
     from kitchen_coach import INSTRUCTIONS
     selected = guarded.scenarios()
-    report = {"prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
+    from clinical_gate import VERSION
+    report = {"gate_version": VERSION, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
               "scenario_sha256": hashlib.sha256(json.dumps(selected, sort_keys=True).encode()).hexdigest(),
               "results": [{"scenario": selected[0]["id"], "turn": 1,
                            "model_requested": "gpt-4.1-mini", "application_status": "ok",
                            "hard_fail": False, "evidence": "OPERATOR_REVIEWED"}]}
+    report["results"].append({**report["results"][0], "turn": 2})
     path = tmp_path / "previous.json"
     path.write_text(json.dumps(report))
     assert guarded.remaining_scenarios(path, selected, "gpt-4.1-mini") == selected[1:]

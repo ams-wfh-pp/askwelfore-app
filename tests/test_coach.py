@@ -68,6 +68,17 @@ def test_scenarios_context_reaches_coach_without_loss(rig, scenario):
     headers = sign_in(client)
     profile = {**PROFILE, **scenario["profile"]}
     assert send(client, headers, scenario["question"], profile).status_code == 200
+    if scenario["id"] in {"allergy-substitution", "conflicting-guidance"}:
+        assert not captured
+        state = client.get("/coach/state").json()
+        assert state["profile"] == profile
+        assert state["history"][0]["content"] == scenario["question"]
+        assert "confirm" in state["history"][1]["content"].lower()
+        if scenario.get("follow_up"):
+            now[0] += 3
+            assert send(client, headers, scenario["follow_up"], profile).status_code == 200
+            assert not captured
+        return
     context = json.loads(captured[-1][1][0]["content"].split("\n", 1)[1])
     assert context == profile
     assert captured[-1][1][-1]["content"] == scenario["question"]
