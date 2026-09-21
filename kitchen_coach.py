@@ -120,14 +120,32 @@ class OpenAIResponses:
                 json=payload, timeout=(5, 25), stream=True, allow_redirects=False,
             ) as response:
                 metadata['http_status'] = response.status_code
-                if response.status_code != 200:
-                    raise CoachUnavailable()
                 body = bytearray()
                 for chunk in response.iter_content(8192):
                     body.extend(chunk)
                     if len(body) > 65536:
                         raise CoachUnavailable()
                 data = json.loads(body)
+                if response.status_code != 200:
+                    error = data.get("error", {})
+                    if not isinstance(error, dict):
+                        error = {}
+                    # Only known labels may leave this scope. Never save free-text
+                    # messages, unknown fields, headers, keys or raw response bodies.
+                    allowed = {
+                        "code": {"invalid_api_key", "insufficient_quota", "model_not_found",
+                                 "unsupported_parameter", "unsupported_value", "invalid_value",
+                                 "missing_required_parameter", "invalid_request",
+                                 "context_length_exceeded", "rate_limit_exceeded"},
+                        "type": {"invalid_request_error", "authentication_error",
+                                 "permission_error", "insufficient_quota", "rate_limit_error"},
+                        "param": {"model", "input", "instructions", "max_output_tokens",
+                                  "store", "reasoning", "reasoning.effort"},
+                    }
+                    for field, values in allowed.items():
+                        value = error.get(field)
+                        metadata["error_" + field] = value if isinstance(value, str) and value in values else "unrecognized"
+                    raise CoachUnavailable()
             metadata.update(status=data.get('status', 'unknown'),
                             model=data.get('model', self.model), usage=data.get('usage') or {})
             if data.get("status") != "completed":

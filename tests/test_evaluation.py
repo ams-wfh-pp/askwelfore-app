@@ -57,3 +57,29 @@ def test_configurable_output_budget():
         with pytest.raises(ValueError):
             KitchenCoach(lambda **kwargs: "fixture", max_output_tokens=invalid)
     assert KitchenCoach(lambda **kwargs: "fixture", max_output_tokens=2048)
+
+@pytest.mark.parametrize("code,param,expected", [
+    ("unsupported_parameter", "store", "unsupported_parameter"),
+    ("secret-key-example", "secret-key-example", "unrecognized"),
+])
+def test_error_metadata_never_records_secrets(monkeypatch, code, param, expected):
+    import json
+    import requests
+    from kitchen_coach import OpenAIResponses, CoachUnavailable
+    class Response:
+        status_code = 400
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def iter_content(self, size):
+            yield json.dumps({"error": {"code": code, "type": "invalid_request_error",
+                "param": param, "message": "secret-key-example private content"},
+                "extra": "secret-key-example"}).encode()
+    monkeypatch.setattr(requests, "post", lambda *a, **kw: Response())
+    metadata = {}
+    with pytest.raises(CoachUnavailable):
+        OpenAIResponses("secret-key-example", "gpt-4.1-mini", observe=metadata.update)(
+            "private instructions", [], 700)
+    assert metadata["error_code"] == expected
+    assert metadata["http_status"] == 400
+    assert "secret-key-example" not in json.dumps(metadata)
+    assert "private" not in json.dumps(metadata)
