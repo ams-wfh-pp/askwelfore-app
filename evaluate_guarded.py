@@ -4,6 +4,7 @@ import hashlib
 import json
 import sys
 from datetime import datetime
+from pathlib import Path
 from evaluate_coach import ROOT, DIMENSIONS, cases, run
 from coach_key_window import normalize_entry
 from run_coach_pilot import valid_key_entry
@@ -17,6 +18,30 @@ def scenarios():
              "new-allergy-follow-up", "approval-request", "caribbean-sodium",
              "mixed-cuisine", "limited-equipment", "household-dislike", "missing-ingredient"]
     return [by_id[name] for name in order]
+
+def remaining_scenarios(previous, selected, model):
+    from kitchen_coach import INSTRUCTIONS
+    report = json.loads(previous.read_text(encoding="utf-8"))
+    if report["prompt_sha256"] != hashlib.sha256(INSTRUCTIONS.encode()).hexdigest():
+        raise ValueError("Cannot resume after instructions changed")
+    if report["scenario_sha256"] != hashlib.sha256(json.dumps(selected, sort_keys=True).encode()).hexdigest():
+        raise ValueError("Cannot resume changed scenarios")
+    rows = report["results"]
+    if not rows or any(r["model_requested"] != model or r["application_status"] != "ok"
+                       or r.get("hard_fail") is not False or r.get("evidence") != "OPERATOR_REVIEWED"
+                       for r in rows):
+        raise ValueError("Previous responses must be reviewed without a hard failure")
+    completed = set()
+    for case in selected:
+        matching = [r for r in rows if r["scenario"] == case["id"]]
+        if matching:
+            expected = 1 + bool(case.get("follow_up"))
+            if [r["turn"] for r in matching] != list(range(1, expected + 1)):
+                raise ValueError("Do not resume an incomplete scenario")
+            completed.add(case["id"])
+    if any(r["scenario"] not in completed for r in rows):
+        raise ValueError("Unknown previous scenario")
+    return [case for case in selected if case["id"] not in completed]
 
 def review_response(row):
     digest = hashlib.sha256(row["answer"].encode()).hexdigest()
@@ -44,8 +69,11 @@ def main():
     parser.add_argument("--live", action="store_true")
     # This selection affects the evaluation only; the app model remains configurable.
     parser.add_argument("--model", choices=["gpt-4.1-mini"], default="gpt-4.1-mini")
+    parser.add_argument("--resume-reviewed", type=Path)
     args = parser.parse_args()
     selected = scenarios()
+    if args.resume_reviewed:
+        selected = remaining_scenarios(args.resume_reviewed, selected, args.model)
     count = sum(1 + bool(case.get("follow_up")) for case in selected)
     print(f"Guarded evaluation: at most {count} calls; model {args.model}; 700 output tokens; no retries.", flush=True)
     if not args.live:

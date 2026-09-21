@@ -68,3 +68,23 @@ def test_api_failure_stops_before_review_and_next_call(tmp_path):
                  models=["gpt-4.1-mini"], review=lambda row: pytest.fail("No successful answer to review"))
     assert len(calls) == 1
     assert report["stopped_early"]
+
+def test_resume_skips_only_completed_reviewed_cases(tmp_path):
+    from kitchen_coach import INSTRUCTIONS
+    selected = guarded.scenarios()
+    report = {"prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
+              "scenario_sha256": hashlib.sha256(json.dumps(selected, sort_keys=True).encode()).hexdigest(),
+              "results": [{"scenario": selected[0]["id"], "turn": 1,
+                           "model_requested": "gpt-4.1-mini", "application_status": "ok",
+                           "hard_fail": False, "evidence": "OPERATOR_REVIEWED"}]}
+    path = tmp_path / "previous.json"
+    path.write_text(json.dumps(report))
+    assert guarded.remaining_scenarios(path, selected, "gpt-4.1-mini") == selected[1:]
+    report["results"][0]["hard_fail"] = True
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError):
+        guarded.remaining_scenarios(path, selected, "gpt-4.1-mini")
+    report["results"][0]["hard_fail"] = None
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError):
+        guarded.remaining_scenarios(path, selected, "gpt-4.1-mini")
