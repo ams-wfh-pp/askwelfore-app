@@ -90,12 +90,24 @@ def analyze(text, context_text=""):
 
 TEMP = re.compile(r"(\d+(?:\.\d+)?)\s*(?:degrees?\s*|\u00b0\s*)?(f(?:ahrenheit)?|c(?:elsius)?)\b")
 
+def endpoint_statements(analysis):
+    """Bind each endpoint clause to its named food, retaining pronoun context.
+    Action objects remain unchanged: an endpoint subject is not a washing object.
+    """
+    for statement in analysis.statements:
+        referent = statement.foods
+        for clause in re.split(r"\b(?:and|but|while|until)\b", statement.text):
+            named = objects(clause)
+            if named:
+                referent = named
+            yield Statement(clause, referent)
+
 def poultry_endpoint(analysis):
     """Endpoint must refer to poultry, be internal (not oven), and be measured.
     Return False for a contradicting temperature or rejection of a thermometer.
     """
     target, measurement = False, False
-    for statement in analysis.statements:
+    for statement in endpoint_statements(analysis):
         if "poultry" not in statement.foods:
             continue
         text = statement.text

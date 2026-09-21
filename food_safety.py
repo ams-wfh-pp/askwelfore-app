@@ -7,7 +7,7 @@ import unicodedata
 from dataclasses import dataclass
 from food_actions import analyze, unsafe_washing, poultry_cooking, poultry_endpoint
 
-VERSION = "food-safety-v2"
+VERSION = "food-safety-v2.1"  # Validator precision revision; policy rules unchanged.
 
 @dataclass(frozen=True)
 class Decision:
