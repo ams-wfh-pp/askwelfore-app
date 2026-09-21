@@ -19,10 +19,19 @@ def scenarios():
              "mixed-cuisine", "limited-equipment", "household-dislike", "missing-ingredient"]
     return [by_id[name] for name in order]
 
+def food_safety_scenarios():
+    by_id = {case["id"]: case for case in scenarios()}
+    return [by_id[name] for name in [
+        "approval-request", "caribbean-sodium", "mixed-cuisine",
+        "limited-equipment", "household-dislike", "missing-ingredient"]]
+
 def remaining_scenarios(previous, selected, model):
     from kitchen_coach import INSTRUCTIONS
     report = json.loads(previous.read_text(encoding="utf-8"))
     from clinical_gate import VERSION
+    from food_safety import VERSION as FOOD_VERSION
+    if report.get("food_safety_version") != FOOD_VERSION:
+        raise ValueError("Cannot resume across food policy changes")
     if report.get("gate_version") != VERSION:
         raise ValueError("Cannot resume across clinical gate changes")
     if report["prompt_sha256"] != hashlib.sha256(INSTRUCTIONS.encode()).hexdigest():
@@ -110,8 +119,9 @@ def main():
     # This selection affects the evaluation only; the app model remains configurable.
     parser.add_argument("--model", choices=["gpt-4.1-mini"], default="gpt-4.1-mini")
     parser.add_argument("--resume-reviewed", type=Path)
+    parser.add_argument("--suite", choices=["clinical", "food-safety-recheck"], default="clinical")
     args = parser.parse_args()
-    selected = scenarios()
+    selected = food_safety_scenarios() if args.suite == "food-safety-recheck" else scenarios()
     if args.resume_reviewed:
         selected = remaining_scenarios(args.resume_reviewed, selected, args.model)
     count = sum(1 + bool(case.get("follow_up")) for case in selected)
@@ -123,7 +133,7 @@ def main():
     output = ROOT / "eval-results" / (datetime.now().strftime("%Y%m%d-%H%M%S") + "-guarded")
     from evaluation_review import wait_review
     try:
-        report = run("revised-safety", "", output, adapter_factory=deferred.factory, models=[args.model],
+        report = run(args.suite, "", output, adapter_factory=deferred.factory, models=[args.model],
                      scenarios=selected, review=lambda row: review_response(row, lambda item, digest: wait_review(output, item, digest)), max_output_tokens=700)
         print("EVALUATION_STOPPED" if report["stopped_early"] else "EVALUATION_FINISHED", flush=True)
         print("Evidence: " + str(output), flush=True)

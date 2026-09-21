@@ -9,7 +9,7 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
-VERSION = "clinical-gate-v1"
+VERSION = "clinical-gate-v2"
 
 @dataclass(frozen=True)
 class GateDecision:
@@ -25,7 +25,7 @@ CONFIRM = {
     "clinical": "Please confirm the specific nutrition instructions with your qualified healthcare professional. I can't establish or change a therapeutic target, resolve unclear guidance, or suggest an interim clinical plan.",
     "product": "Before using that product, check its ingredients and label against the household's restrictions. If allergy suitability or cross-contact safety is uncertain, confirm it with your qualified healthcare professional. I can't treat an unchecked product as suitable.",
 }
-CONTINUE = " Your meal and household context will stay in this conversation. I can help organize the cooking workspace while you confirm."
+CONTINUE = " Your meal and household context will stay in this conversation. While you confirm, you can ask: How do I clean a cutting board? Or: How do I check chicken with a thermometer?"
 WORKSPACE = ("Clear a work area and set out the equipment you already planned to use. "
              "Keep raw-food tools separate from ready-to-eat-food tools. "
              "We can organize the workspace without choosing ingredients, portions or clinical targets. "
@@ -78,7 +78,7 @@ def assess(profile, history, message):
         reason = "clinical"
     elif has(r"\bhow (?:much|many)\b|\b(?:safe|daily|recommended) (?:amount|intake|portion)\b|\bset (?:me )?a (?:target|limit)\b", current) and has(r"\b(sodium|salt|diet\w*|nutrition|carb\w*|protein|fat)\b", text):
         reason = "clinical"
-    elif normalize(profile.get("restrictions", "")).rstrip(".") not in {"none", "none known", "no allergies", "no known allergies", "no restrictions", "vegetarian", "vegan", "pescatarian", "halal", "kosher"}:
+    elif normalize(profile.get("restrictions", "")).rstrip(".") not in {"none", "none known", "none reported yet", "no allergies", "no known allergies", "no restrictions", "vegetarian", "vegan", "pescatarian", "halal", "kosher"}:
         reason = "clinical"
     elif guidance not in ORDINARY_GOALS:
         reason = "clinical"
@@ -93,4 +93,14 @@ def assess(profile, history, message):
         "help me set out my cooking equipment", "help me organize my kitchen tools",
     }:
         return GateDecision(reason + ":independent-workspace", WORKSPACE)
+    from food_safety import TEXT, TEMPS
+    independent = {
+        "how do i wash my hands before cooking": "Wash hands with soap and running water for at least 20 seconds before food preparation and after touching raw food.",
+        "how do i clean a cutting board": TEXT["surfaces"],
+        "how do i check chicken with a thermometer": TEMPS["poultry"][2],
+    }
+    if current.rstrip(".?!") in independent:
+        return GateDecision(reason + ":independent-handling",
+                            independent[current.rstrip(".?!")] +
+                            " Please still confirm the unresolved nutrition guidance with your qualified healthcare professional; this does not establish ingredient or portion suitability.")
     return GateDecision(reason, CONFIRM[reason] + CONTINUE)

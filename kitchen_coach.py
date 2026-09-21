@@ -4,6 +4,7 @@ import time
 from dataclasses import dataclass
 from typing import Callable
 from clinical_gate import assess
+from food_safety import preflight, screen, POLICY_INSTRUCTIONS
 
 
 INSTRUCTIONS = """You are AskWelFore, a Kitchen-to-Kitchen Coach.
@@ -91,6 +92,9 @@ only the next useful steps; within the word limit. Return only the coaching resp
 """
 
 
+INSTRUCTIONS += POLICY_INSTRUCTIONS
+
+
 class CoachError(Exception):
     """Only fixed, non-sensitive messages should reach the web layer."""
 
@@ -108,6 +112,7 @@ class CoachReply:
     text: str
     source: str = "model"
     safety_reason: str = ""
+    blocked_draft: str = ""
 
 
 class KitchenCoach:
@@ -136,9 +141,15 @@ class KitchenCoach:
         decision = assess(profile, history, message)
         if decision is not None:
             return CoachReply(decision.text, source="clinical_gate", safety_reason=decision.reason)
+        food = preflight(profile, history, message)
+        if food is not None:
+            return CoachReply(food.text, source="food_safety_gate", safety_reason=food.reason)
         answer = self.generate(INSTRUCTIONS, messages, self.max_output_tokens)
         if not isinstance(answer, str) or not answer.strip() or len(answer) > self.MAX_REPLY_CHARS:
             raise CoachUnavailable()
+        food = screen(profile, history, message, answer)
+        if food is not None:
+            return CoachReply(food.text, source="food_safety_gate", safety_reason=food.reason, blocked_draft=answer)
         return CoachReply(text=answer.strip())
 
 

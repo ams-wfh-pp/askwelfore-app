@@ -9,6 +9,7 @@ from pathlib import Path
 
 from kitchen_coach import INSTRUCTIONS, KitchenCoach, OpenAIResponses
 from clinical_gate import VERSION as GATE_VERSION
+from food_safety import VERSION as FOOD_SAFETY_VERSION
 
 ROOT = Path(__file__).parent
 MODEL_SETTINGS = {
@@ -55,7 +56,7 @@ def run(suite, key, output, adapter_factory=OpenAIResponses, *,
     output.mkdir(parents=True, exist_ok=False)
     report = {
         "created_utc": datetime.now(timezone.utc).isoformat(),
-        "suite": suite, "gate_version": GATE_VERSION, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
+        "suite": suite, "gate_version": GATE_VERSION, "food_safety_version": FOOD_SAFETY_VERSION, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
         "scenario_sha256": hashlib.sha256(json.dumps(scenarios, sort_keys=True).encode()).hexdigest(),
         "max_calls": total, "max_output_tokens": max_output_tokens,
         "models": {model: MODEL_SETTINGS[model] for model in models}, "rubric": DIMENSIONS, "results": [],
@@ -98,7 +99,8 @@ def run(suite, key, output, adapter_factory=OpenAIResponses, *,
                     reply = service.respond(profile, history, question)
                     answer = reply.text
                     row.update(answer=answer, word_count=len(answer.split()), application_status="ok",
-                               response_source=reply.source, safety_reason=reply.safety_reason)
+                               response_source=reply.source, safety_reason=reply.safety_reason,
+                               blocked_draft=reply.blocked_draft)
                     history.extend([{"role": "user", "content": question},
                                     {"role": "assistant", "content": answer}])
                 except Exception:
