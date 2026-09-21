@@ -37,4 +37,4 @@ The corrected trace identifies the endpoint clause's food as poultry and returns
 
 ## Live recheck
 
-Pending. The authorized sequence remains the two initial cases, reviewed separately, followed by the five paused responses only if both pass. No paid call has been made for this correction at the time this note was written. Phase 1 remains undeployed; no merge, voice work or scope expansion.
+The two-case live run stopped after correct interceptions: the model omitted thermometer measurement in both drafts, so compliant-output delivery was not demonstrated. The five remaining responses stayed paused. See VALIDATOR_PRECISION_EVALUATION.md for results and cost. Phase 1 remains undeployed; no merge, voice work or scope expansion.
