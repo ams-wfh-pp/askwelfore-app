@@ -4,7 +4,8 @@ import pytest
 from kitchen_coach import KitchenCoach
 from food_safety import preflight, screen
 P = dict(household="Two adults", culture="Caribbean", restrictions="None",
-         guidance="Reduce sodium", ingredients="Chicken, rice, garlic, thyme")
+         guidance="Reduce sodium", ingredients="Chicken, rice, garlic, thyme",
+         constraints="food thermometer available; stove; oven; microwave; blender; food processor")
 
 @pytest.mark.parametrize("draft", [
  "Rinse the chicken and pat dry.",

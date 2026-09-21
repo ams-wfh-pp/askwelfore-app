@@ -47,6 +47,7 @@ def test_time_only_or_cross_contamination_cannot_escape(draft):
 
 def test_changed_policy_evidence_cannot_resume(tmp_path):
     path = tmp_path / "old.json"
-    path.write_text(json.dumps({"food_safety_version": "old-policy"}))
+    from kitchen_context import VERSION
+    path.write_text(json.dumps({"food_safety_version": "old-policy", "kitchen_context_version": VERSION}))
     with pytest.raises(ValueError, match="food policy"):
         remaining_scenarios(path, food_safety_scenarios(), "gpt-4.1-mini")

@@ -1,5 +1,6 @@
 """Isolated collaborator sub-application. Single process, ephemeral sessions."""
 import asyncio
+import copy
 import hmac
 import os
 import secrets
@@ -16,6 +17,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.concurrency import run_in_threadpool
 
 from kitchen_coach import KitchenCoach, ContextFull, OpenAIResponses
+from kitchen_context import KitchenContext
 
 ROOT = Path(__file__).parent
 COOKIE = "askwelfore_coach"
@@ -84,6 +86,7 @@ class Session:
     csrf: str = field(default_factory=lambda: secrets.token_urlsafe(32))
     profile: dict = field(default_factory=dict)
     history: list = field(default_factory=list)
+    kitchen: KitchenContext = field(default_factory=KitchenContext)
     calls: int = 0
     last_call: float = -100
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
@@ -165,6 +168,7 @@ def create_coach_app(settings=None, coach=None, clock=time.monotonic):
             session.expires = 0
             session.profile.clear()
             session.history.clear()
+            session.kitchen.clear()
             if session.expiry_handle:
                 session.expiry_handle.cancel()
 
@@ -238,7 +242,7 @@ def create_coach_app(settings=None, coach=None, clock=time.monotonic):
         session = active(request)
         if not configured or not session:
             return error("Your session ended. Please sign in again.", 401)
-        return {"profile": session.profile, "history": session.history, "ready": ready}
+        return {"profile": session.profile, "history": session.history, "kitchen_context": session.kitchen.summary(), "ready": ready}
 
     @app.post("/message")
     async def message(request: Request):
@@ -284,13 +288,15 @@ def create_coach_app(settings=None, coach=None, clock=time.monotonic):
                 async with capacity:
                     if session.expires <= clock():
                         return error("Your session ended. Reload and sign in again.", 401)
-                    answer = await run_in_threadpool(service.respond, profile, list(session.history), text.strip())
+                    kitchen = copy.deepcopy(session.kitchen)
+                    answer = await run_in_threadpool(service.respond, profile, list(session.history), text.strip(), kitchen=kitchen)
             except ContextFull:
                 return error("This conversation is full. Start another situation; carry forward your restrictions and latest constraints.", 409)
             except Exception:
                 return error("The AI coach could not reply. Your question is still here. Please try again; no meal-plan substitute was used.", 503)
             if session.expires <= clock() or active(request) is not session:
                 return error("Your session ended. Reload and sign in again.", 401)
+            session.kitchen = kitchen
             session.history.extend([{"role": "user", "content": text.strip()},
                                     {"role": "assistant", "content": answer.text}])
             return {"reply": answer.text}
@@ -303,6 +309,7 @@ def create_coach_app(settings=None, coach=None, clock=time.monotonic):
         if session.lock.locked():
             return error("Please wait for the current reply.", 409)
         session.history.clear()
+        session.kitchen.reset_conversation()
         return {"ok": True}
 
     @app.post("/logout")

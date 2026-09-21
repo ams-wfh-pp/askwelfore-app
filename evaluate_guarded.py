@@ -39,6 +39,9 @@ def remaining_scenarios(previous, selected, model):
     from kitchen_coach import INSTRUCTIONS
     report = json.loads(previous.read_text(encoding="utf-8"))
     from clinical_gate import VERSION
+    from kitchen_context import VERSION as KITCHEN_VERSION
+    if report.get("kitchen_context_version") != KITCHEN_VERSION:
+        raise ValueError("Cannot resume across kitchen context changes")
     from food_safety import VERSION as FOOD_VERSION
     if report.get("food_safety_version") != FOOD_VERSION:
         raise ValueError("Cannot resume across food policy changes")

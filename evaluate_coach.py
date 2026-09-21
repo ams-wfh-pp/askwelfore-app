@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from kitchen_coach import INSTRUCTIONS, KitchenCoach, OpenAIResponses
+from kitchen_context import KitchenContext, VERSION as KITCHEN_CONTEXT_VERSION
 from clinical_gate import VERSION as GATE_VERSION
 from food_safety import VERSION as FOOD_SAFETY_VERSION
 
@@ -56,7 +57,7 @@ def run(suite, key, output, adapter_factory=OpenAIResponses, *,
     output.mkdir(parents=True, exist_ok=False)
     report = {
         "created_utc": datetime.now(timezone.utc).isoformat(),
-        "suite": suite, "gate_version": GATE_VERSION, "food_safety_version": FOOD_SAFETY_VERSION, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
+        "suite": suite, "kitchen_context_version": KITCHEN_CONTEXT_VERSION, "gate_version": GATE_VERSION, "food_safety_version": FOOD_SAFETY_VERSION, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
         "scenario_sha256": hashlib.sha256(json.dumps(scenarios, sort_keys=True).encode()).hexdigest(),
         "max_calls": total, "max_output_tokens": max_output_tokens,
         "models": {model: MODEL_SETTINGS[model] for model in models}, "rubric": DIMENSIONS, "results": [],
@@ -77,6 +78,7 @@ def run(suite, key, output, adapter_factory=OpenAIResponses, *,
                 break
             profile = {**DEFAULT_PROFILE, **case["profile"]}
             history = []
+            kitchen = KitchenContext()
             questions = [case["question"]] + ([case["follow_up"]] if case.get("follow_up") else [])
             for turn, question in enumerate(questions, 1):
                 telemetry = {}
@@ -96,7 +98,7 @@ def run(suite, key, output, adapter_factory=OpenAIResponses, *,
                 start = time.monotonic()
                 attempted += 1
                 try:
-                    reply = service.respond(profile, history, question)
+                    reply = service.respond(profile, history, question, kitchen=kitchen)
                     answer = reply.text
                     row.update(answer=answer, word_count=len(answer.split()), application_status="ok",
                                response_source=reply.source, safety_reason=reply.safety_reason,

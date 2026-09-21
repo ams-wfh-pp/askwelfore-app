@@ -77,7 +77,8 @@ def test_resume_skips_only_completed_reviewed_cases(tmp_path):
     selected = guarded.scenarios()
     from clinical_gate import VERSION
     from food_safety import VERSION as FOOD_VERSION
-    report = {"food_safety_version": FOOD_VERSION, "gate_version": VERSION, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
+    from kitchen_context import VERSION as KITCHEN_VERSION
+    report = {"kitchen_context_version": KITCHEN_VERSION, "food_safety_version": FOOD_VERSION, "gate_version": VERSION, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
               "scenario_sha256": hashlib.sha256(json.dumps(selected, sort_keys=True).encode()).hexdigest(),
               "results": [{"scenario": selected[0]["id"], "turn": 1,
                            "model_requested": "gpt-4.1-mini", "application_status": "ok",

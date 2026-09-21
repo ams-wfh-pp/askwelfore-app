@@ -73,7 +73,7 @@ document.getElementById("message-form")?.addEventListener("submit", async event 
 });
 document.getElementById("reset")?.addEventListener("click", async () => {
   if (busy) return;
-  if (!confirm("Clear this conversation? Household context stays. Carry forward any restrictions or changes from your follow-ups before continuing.")) return;
+  if (!confirm("Clear this conversation? Household context and confirmed equipment stay. Carry forward other restrictions or changes from your follow-ups before continuing.")) return;
   setBusy(true);
   try {
     await api("reset", {});

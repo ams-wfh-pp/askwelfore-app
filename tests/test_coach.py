@@ -80,6 +80,7 @@ def test_scenarios_context_reaches_coach_without_loss(rig, scenario):
             assert not captured
         return
     context = json.loads(captured[-1][1][0]["content"].split("\n", 1)[1])
+    assert "tools" in context.pop("kitchen_context")
     assert context == profile
     assert captured[-1][1][-1]["content"] == scenario["question"]
     assert captured[-1][0] == INSTRUCTIONS

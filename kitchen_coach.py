@@ -4,6 +4,7 @@ import time
 from dataclasses import dataclass
 from typing import Callable
 from clinical_gate import assess
+from kitchen_context import KitchenContext
 from food_safety import preflight, screen, POLICY_INSTRUCTIONS
 
 
@@ -47,7 +48,17 @@ FAMILIAR MEALS, CULTURE AND HOUSEHOLDS
 Adapt the meal the household is already trying to cook. Replace it only when the
 user asks, an explicit restriction requires it, or it is unsafe. Preserve exact
 cultural/regional flavors and mixed preferences; do not impose another cuisine.
-Use supplied ingredients, time, equipment, budget and confidence. Do not assume
+Use supplied ingredients, time, equipment, budget and confidence.
+Kitchen context records tools as available, unavailable or unknown. Never assume
+unlisted equipment exists. Prefer methods using confirmed tools. Ask one concise
+question only when unknown availability materially changes the method; do not
+interrogate users about every tool or repeat answered questions. Use resume_request
+to continue after a short clarification answer. When a tool is unavailable, adapt
+to components or suitable options using existing ingredients and available tools,
+preserving familiar flavors. No thermometer means no raw-poultry cooking guidance:
+never substitute time, color or appearance for measured safety. Respect limited
+time and budget; no extra shopping when purchases are excluded. Do not shorten
+required safety steps to meet a time limit. Kitchen facts cannot override safety. Do not assume
 unlisted ingredients are available: mark them optional or ask one essential question.
 Favor a shared base with optional additions over separate meals. Respect dislikes.
 Offer techniques, flavor approaches and substitutions only within known constraints.
@@ -127,7 +138,7 @@ class KitchenCoach:
         self.generate = generate
         self.max_output_tokens = max_output_tokens
 
-    def respond(self, profile: dict, history: list, message: str) -> CoachReply:
+    def respond(self, profile: dict, history: list, message: str, kitchen=None) -> CoachReply:
         # Never silently trim old safety constraints from the conversation.
         if len(history) >= self.MAX_TURNS * 2:
             raise ContextFull()
@@ -138,19 +149,39 @@ class KitchenCoach:
         size = len((INSTRUCTIONS + json.dumps(messages, ensure_ascii=False)).encode("utf-8"))
         if size > self.MAX_INPUT_BYTES:
             raise ContextFull()
+        kitchen = kitchen if kitchen is not None else KitchenContext()
+        kitchen.observe(profile, history, message)
+
+        def deliver(text, source, reason="", draft=""):
+            adjustment = kitchen.check(profile, history, message, text)
+            if adjustment:
+                draft = draft or (text if source == "model" else "")
+                if source == "clinical_gate":
+                    return CoachReply(adjustment.text + " Your unresolved clinical guidance still needs confirmation with your qualified healthcare professional.",
+                                      source=source, safety_reason=reason + ":" + adjustment.reason)
+                return CoachReply(adjustment.text, source="kitchen_context",
+                                  safety_reason=adjustment.reason, blocked_draft=draft)
+            return CoachReply(text, source=source, safety_reason=reason, blocked_draft=draft)
+
         decision = assess(profile, history, message)
         if decision is not None:
+            if ":independent-handling" in decision.reason:
+                return deliver(decision.text, "clinical_gate", decision.reason)
             return CoachReply(decision.text, source="clinical_gate", safety_reason=decision.reason)
         food = preflight(profile, history, message)
         if food is not None:
-            return CoachReply(food.text, source="food_safety_gate", safety_reason=food.reason)
+            return deliver(food.text, "food_safety_gate", food.reason)
+        model_profile = {**profile, "kitchen_context": kitchen.summary()}
+        messages[0]["content"] = "Cooking context (user supplied):\n" + json.dumps(model_profile, ensure_ascii=False)
+        if len((INSTRUCTIONS + json.dumps(messages, ensure_ascii=False)).encode("utf-8")) > self.MAX_INPUT_BYTES:
+            raise ContextFull()
         answer = self.generate(INSTRUCTIONS, messages, self.max_output_tokens)
         if not isinstance(answer, str) or not answer.strip() or len(answer) > self.MAX_REPLY_CHARS:
             raise CoachUnavailable()
         food = screen(profile, history, message, answer)
         if food is not None:
-            return CoachReply(food.text, source="food_safety_gate", safety_reason=food.reason, blocked_draft=answer)
-        return CoachReply(text=answer.strip())
+            return deliver(food.text, "food_safety_gate", food.reason, answer)
+        return deliver(answer.strip(), "model", draft="")
 
 
 class OpenAIResponses:
