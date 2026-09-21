@@ -46,13 +46,13 @@ def remaining_scenarios(previous, selected, model):
         raise ValueError("Unknown previous scenario")
     return [case for case in selected if case["id"] not in completed]
 
-def review_response(row):
+def review_response(row, decision_reader=None):
     digest = hashlib.sha256(row["answer"].encode()).hexdigest()
     print("REVIEW_REQUIRED " + json.dumps({"answer_sha256": digest, **row}), flush=True)
     # Reviewed by the operator, not by an automated keyword pass or a paid judge.
     # Invalid input / EOF is a permanent stop for this run.
     try:
-        decision = json.loads(sys.stdin.readline())
+        decision = decision_reader(row, digest) if decision_reader else json.loads(sys.stdin.readline())
         scores = decision["scores"]
         if decision.get("answer_sha256") != digest:
             return False
@@ -66,6 +66,43 @@ def review_response(row):
         return decision.get("decision") == "continue" and decision["hard_fail"] is False
     except Exception:
         return False
+
+class DeferredProvider:
+    """Do not request credentials for fixed gate replies."""
+    def __init__(self, get_key, adapter_factory=None):
+        from kitchen_coach import OpenAIResponses
+        self.get_key = get_key
+        self.adapter_factory = adapter_factory or OpenAIResponses
+        self.key = ""
+
+    def factory(self, unused_key, model, reasoning, observe):
+        def generate(*args):
+            if not self.key:
+                self.key = normalize_entry(self.get_key())
+                if not valid_key_entry(self.key):
+                    self.clear()
+                    raise ValueError("Cancelled or invalid key entry")
+            return self.adapter_factory(self.key, model, reasoning, observe)(*args)
+        return generate
+
+    def clear(self):
+        self.key = ""
+
+def prompt_key():
+    import tkinter as tk
+    from tkinter import simpledialog
+    root = tk.Tk()
+    root.withdraw()
+    try:
+        return simpledialog.askstring(
+            "AskWelFore - remaining evaluation",
+            "The fixed safety checks passed. Paste your OpenAI key using Ctrl+V.\n"
+            "It is hidden and not saved.\n"
+            "Click OK to continue the evaluation you authorized.\n"
+            "Each response pauses for Codex review. Cancel sends no request.",
+            show="*", parent=root)
+    finally:
+        root.destroy()
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -82,35 +119,18 @@ def main():
     if not args.live:
         print("Dry run. No key requested or API called.", flush=True)
         return
-    import tkinter as tk
-    from tkinter import simpledialog
-    root = tk.Tk()
-    root.withdraw()
-    key = ""
-    try:
-        key = normalize_entry(simpledialog.askstring(
-            "AskWelFore - revised evaluation",
-            "Paste your OpenAI key using Ctrl+V. It stays hidden and is not saved.\n"
-            "You authorized this revised GPT-4.1 mini evaluation.\n"
-            "Click OK to start; each answer pauses for Codex review.\n"
-            "Cancel sends no requests.",
-            show="*", parent=root))
-    finally:
-        root.destroy()
-    if not valid_key_entry(key):
-        key = ""
-        print("Cancelled or invalid key input. No API requests made.", flush=True)
-        return
+    deferred = DeferredProvider(prompt_key)
     output = ROOT / "eval-results" / (datetime.now().strftime("%Y%m%d-%H%M%S") + "-guarded")
+    from evaluation_review import wait_review
     try:
-        report = run("revised-safety", key, output, models=[args.model],
-                     scenarios=selected, review=review_response, max_output_tokens=700)
+        report = run("revised-safety", "", output, adapter_factory=deferred.factory, models=[args.model],
+                     scenarios=selected, review=lambda row: review_response(row, lambda item, digest: wait_review(output, item, digest)), max_output_tokens=700)
         print("EVALUATION_STOPPED" if report["stopped_early"] else "EVALUATION_FINISHED", flush=True)
         print("Evidence: " + str(output), flush=True)
     except Exception:
         print("Evaluation stopped unexpectedly. Inspect saved evidence before any retry.", flush=True)
     finally:
-        key = ""
+        deferred.clear()
 
 if __name__ == "__main__":
     main()

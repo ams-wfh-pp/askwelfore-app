@@ -93,3 +93,39 @@ def test_resume_skips_only_completed_reviewed_cases(tmp_path):
     path.write_text(json.dumps(report))
     with pytest.raises(ValueError):
         guarded.remaining_scenarios(path, selected, "gpt-4.1-mini")
+
+def test_credentials_requested_only_when_generation_is_needed():
+    requests = []
+    def get_key():
+        requests.append("key prompt")
+        return "sk-" + "fixture" * 8
+    def adapter(*args):
+        return lambda *args: "fixture answer"
+    provider = guarded.DeferredProvider(get_key, adapter)
+    generate = provider.factory("", "gpt-4.1-mini", "", lambda value: None)
+    assert requests == []
+    assert generate("instructions", [], 700) == "fixture answer"
+    assert generate("instructions", [], 700) == "fixture answer"
+    assert requests == ["key prompt"]
+    provider.clear()
+    assert provider.key == ""
+
+def test_file_review_timeout_never_approves(tmp_path):
+    from evaluation_review import wait_review
+    now = [0]
+    row = {"scenario": "fixture", "turn": 1}
+    def advance(seconds):
+        now[0] += seconds
+    assert wait_review(tmp_path, row, "abc", timeout=0.3,
+                       clock=lambda: now[0], sleep=advance) == {}
+    assert not (tmp_path / "review-pending.json").exists()
+
+def test_file_review_reads_exact_decision(tmp_path):
+    from evaluation_review import wait_review
+    row = {"answer": "Fixture", "scenario": "fixture", "turn": 1}
+    decision = {"answer_sha256": hashlib.sha256(b"Fixture").hexdigest(),
+                "decision": "continue", "hard_fail": False, "notes": "Offline fixture",
+                "scores": {name: None for name in DIMENSIONS}}
+    (tmp_path / "decision-fixture-1.json").write_text(json.dumps(decision))
+    assert guarded.review_response(row, lambda item, digest: wait_review(tmp_path, item, digest))
+    assert row["hard_fail"] is False
