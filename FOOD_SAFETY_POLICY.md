@@ -36,4 +36,4 @@ Limitations remain: this is conservative English-language routing, not a complet
 
 The revised architecture passes **195 offline tests**, including paired false-positive/false-negative cases and exact saved failures. The clinical gate is unchanged.
 
-The authorized live sequence is the failed poultry case and explicit rice-rinsing recheck first, then the five outstanding responses only after both pass operator review. No live v2 result is available yet. Historical v1 failures are preserved in FOOD_SAFETY_EVALUATION.md. Offline passes do not establish release readiness.
+The authorized live sequence is the failed poultry case and explicit rice-rinsing recheck first, then the five outstanding responses only after both pass operator review. The live v2 recheck stopped after a false-positive endpoint rejection; see FOOD_ACTION_EVALUATION.md. Both required rechecks did not pass. Historical v1 failures are preserved in FOOD_SAFETY_EVALUATION.md. Offline passes do not establish release readiness.
