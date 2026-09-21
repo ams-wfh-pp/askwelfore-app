@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="coach-csrf" content="{{ csrf }}">
+<title>AskWelFore | Kitchen-to-Kitchen Coach</title>
+<link rel="stylesheet" href="/coach/assets/coach.css">
+<script src="/coach/assets/coach.js" defer></script>
+</head>
+<body><main>
+<header><p class="eyebrow">AskWelFore™ · Collaborator preview</p>
+<h1>Kitchen-to-Kitchen™ Coach</h1>
+<p class="lead">Make trusted nutrition guidance work in your kitchen.</p>
+<p>Nutrition professionals establish the <strong>WHAT</strong>. AskWelFore helps with the <strong>HOW</strong>.</p></header>
+<noscript><p>This text conversation needs JavaScript enabled.</p></noscript>
+<p id="status" role="status" aria-live="polite"></p>
+{% if not signed_in %}
+<section class="card login"><h2>Welcome to the kitchen</h2>
+<p>Use the private access code from your test organizer.</p>
+<form id="login-form"><label for="code">Collaborator access code</label>
+<input id="code" name="code" type="password" autocomplete="off" required maxlength="256">
+<button type="submit">Enter the Kitchen Coach</button></form></section>
+{% else %}
+{% if not ready %}<p class="notice">The text experience is ready to review. AI replies are not connected yet. No paid requests will be made.</p>{% endif %}
+<p class="privacy">Use fictional test details. Your context is kept temporarily in this server session, not in a household account. Signing out, session expiry or a server restart clears it. When AI is connected, your context and messages are sent to the AI provider to generate replies.</p>
+<div class="layout">
+<section class="card"><h2>Your kitchen context</h2>
+<p>Keep the foods and flavors you love. Tell us what needs to work around them.</p>
+<form id="context-form">
+{% for key, info in fields.items() %}
+<label for="{{ key }}">{{ info[0] }}{% if key in ['restrictions', 'guidance'] %} <span class="required">(required)</span>{% endif %}</label>
+<textarea id="{{ key }}" name="{{ key }}" rows="2" maxlength="{{ info[1] }}" {% if key in ['restrictions', 'guidance'] %}required{% endif %}></textarea>
+{% endfor %}
+</form><p class="hint" id="context-hint">You can edit this context before your first reply.</p></section>
+<section class="card conversation"><h2>What’s happening in your kitchen?</h2>
+<p class="example">“I’m cooking chicken and rice. We love Caribbean flavors, and I’m following guidance to reduce sodium. Help me make one meal for everyone.”</p>
+<div id="conversation" role="log" aria-label="Kitchen Coach conversation" aria-live="polite"></div>
+<form id="message-form"><label for="message">Your cooking question or follow-up</label>
+<textarea id="message" name="message" rows="3" maxlength="1600" required placeholder="What would help right now?"></textarea>
+<button id="send" type="submit">Help me make this work</button></form>
+<div class="actions"><button id="reset" type="button" class="secondary">Try another situation</button><button id="logout" type="button" class="secondary">Sign out &amp; clear session</button></div>
+<p class="hint">Another situation clears the conversation and keeps the context above for you to review. Add any restrictions or changes mentioned in follow-ups before continuing.</p>
+</section></div>
+{% endif %}
+<footer>Practical cooking support · Educational only<br>AskWelFore does not diagnose, prescribe medical nutrition therapy, or replace your RDN or healthcare professional.</footer>
+</main></body></html>

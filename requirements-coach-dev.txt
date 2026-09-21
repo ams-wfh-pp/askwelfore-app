@@ -1,0 +1,6 @@
+# Test-only environment. Production requirements and runtime are unchanged.
+-r requirements.txt
+fastapi==0.115.12
+starlette==0.46.2
+pytest==9.1.1
+httpx==0.28.1

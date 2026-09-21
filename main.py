@@ -138,6 +138,11 @@ else:
     print("⚠️ GHL/email functions stubbed (requests not available)")
 
 app = FastAPI()
+# Opt-in collaborator experience; legacy routes and templates are unchanged.
+if os.getenv("COACH_ENABLED", "") == "1":
+    from coach_web import create_coach_app
+    app.mount("/coach", create_coach_app())
+
 # --- BIRTHDAY → AGE AUTO-CONVERTER (for GHL quiz compatibility) ---
 from datetime import datetime, date
 

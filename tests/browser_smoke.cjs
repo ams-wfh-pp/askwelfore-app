@@ -1,0 +1,74 @@
+/* Run with Playwright available. No paid model; local server and synthetic data. */
+const {chromium} = require("playwright");
+const {spawn} = require("node:child_process");
+const fs = require("node:fs");
+const path = require("node:path");
+const assert = require("node:assert/strict");
+const root = path.resolve(__dirname, "..");
+const python = process.platform === "win32" ? path.join(root, ".venv/Scripts/python.exe") : path.join(root, ".venv/bin/python");
+const server = spawn(python, ["-X", "utf8", "tests/browser_fixture.py"], {cwd: root, stdio: ["ignore", "pipe", "pipe"]});
+let browser;
+(async () => {
+  await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error("Local test server did not start")), 15000);
+    server.stderr.on("data", data => {
+      if (String(data).includes("Application startup complete")) {clearTimeout(timeout); resolve();}
+    });
+    server.once("exit", code => {clearTimeout(timeout); reject(new Error("Test server exited " + code));});
+  });
+  browser = await chromium.launch({channel: process.env.COACH_TEST_BROWSER || "msedge", headless: true});
+  const page = await browser.newPage();
+  const errors = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await page.goto("http://127.0.0.1:8766/coach/");
+  await page.locator("#code").fill("wrong");
+  await page.getByRole("button", {name: "Enter the Kitchen Coach"}).click();
+  await page.locator("#status").filter({hasText: "not accepted"}).waitFor();
+  await page.locator("#code").fill("offline-browser-test-only-code-123456");
+  await page.getByRole("button", {name: "Enter the Kitchen Coach"}).click();
+  await page.locator("#household").waitFor();
+  await page.locator("#household").fill("Two adults, one shared meal");
+  await page.locator("#culture").fill("Caribbean and South Indian");
+  await page.locator("#restrictions").fill("Peanut allergy");
+  await page.locator("#guidance").fill("Reduce sodium");
+  await page.locator("#source").fill("My doctor");
+  await page.locator("#ingredients").fill("Chicken, rice, thyme, garlic");
+  await page.locator("#constraints").fill("30 minutes, stove, beginner");
+  await page.locator("#message").fill("Help me make chicken and rice.");
+  await page.locator("#send").click();
+  await page.locator(".assistant").waitFor();
+  assert.equal(await page.evaluate(() => window.injected), undefined);
+  assert.equal(await page.locator("#culture").getAttribute("readonly"), "");
+  await page.reload();
+  await page.locator(".assistant").waitFor();
+  assert.equal(await page.locator("#restrictions").inputValue(), "Peanut allergy");
+  await page.waitForTimeout(2100);
+  await page.locator("#message").fill("I don't have lime.");
+  await page.locator("#send").click();
+  await page.locator(".assistant").nth(1).waitFor();
+  const out = path.resolve(root, "..", "review-artifacts");
+  fs.mkdirSync(out, {recursive: true});
+  await page.setViewportSize({width: 1280, height: 950});
+  await page.screenshot({path: path.join(out, "coach-desktop.png"), fullPage: true});
+  await page.setViewportSize({width: 390, height: 844});
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await page.screenshot({path: path.join(out, "coach-mobile.png"), fullPage: true});
+  await page.waitForTimeout(2100);
+  await page.locator("#message").fill("simulate failure");
+  await page.locator("#send").click();
+  await page.locator("#status").filter({hasText: "could not reply"}).waitFor();
+  assert.equal(await page.locator("#message").inputValue(), "simulate failure");
+  assert.equal(await page.locator(".assistant").count(), 2);
+  page.once("dialog", dialog => dialog.accept());
+  await page.locator("#reset").click();
+  await page.locator("#status").filter({hasText: "Ready for another"}).waitFor();
+  assert.equal(await page.locator(".assistant").count(), 0);
+  assert.equal(await page.locator("#restrictions").inputValue(), "Peanut allergy");
+  assert.equal(await page.locator("#culture").getAttribute("readonly"), null);
+  await page.locator("#logout").click();
+  await page.locator("#code").waitFor();
+  assert.equal(await page.locator("#context-form").count(), 0);
+  assert.deepEqual(errors, []);
+  console.log("PASS: login, context, follow-up, refresh, safe rendering, mobile layout, failure recovery, reset, logout.");
+})().catch(error => {console.error(error); process.exitCode = 1;})
+  .finally(async () => {if (browser) await browser.close(); server.kill();});
