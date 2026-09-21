@@ -83,3 +83,12 @@ def test_error_metadata_never_records_secrets(monkeypatch, code, param, expected
     assert metadata["http_status"] == 400
     assert "secret-key-example" not in json.dumps(metadata)
     assert "private" not in json.dumps(metadata)
+
+
+def test_hidden_key_input_rejects_paste_control_characters():
+    from run_coach_pilot import valid_key_entry
+    assert valid_key_entry("sk-" + "example" * 8)
+    for invalid in ("", chr(22), "sk-" + chr(22) + "x" * 40,
+                    "sk-" + "x" * 40 + " ", "sk-" + "x" * 40 + chr(10),
+                    "wrong-prefix" + "x" * 40):
+        assert not valid_key_entry(invalid)

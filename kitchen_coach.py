@@ -120,12 +120,14 @@ class OpenAIResponses:
                 json=payload, timeout=(5, 25), stream=True, allow_redirects=False,
             ) as response:
                 metadata['http_status'] = response.status_code
+                metadata['response_format'] = 'not_parsed'
                 body = bytearray()
                 for chunk in response.iter_content(8192):
                     body.extend(chunk)
                     if len(body) > 65536:
                         raise CoachUnavailable()
                 data = json.loads(body)
+                metadata['response_format'] = 'json'
                 if response.status_code != 200:
                     error = data.get("error", {})
                     if not isinstance(error, dict):
