@@ -42,17 +42,23 @@ def estimate_cost(usage, model):
                   + cached * rate["cached"] + usage["output_tokens"] * rate["output"]) / 1e6, 8)
 
 
-def run(suite, key, output, adapter_factory=OpenAIResponses):
-    scenarios = cases(suite)
-    total = 2 * sum(1 + bool(case.get("follow_up")) for case in scenarios)
+def run(suite, key, output, adapter_factory=OpenAIResponses, *,
+        models=None, scenarios=None, review=None, max_output_tokens=2048):
+    models = list(MODEL_SETTINGS) if models is None else list(models)
+    if not models or any(model not in MODEL_SETTINGS for model in models):
+        raise ValueError("Unsupported evaluation model")
+    KitchenCoach(lambda *args: "", max_output_tokens=max_output_tokens)
+    scenarios = cases(suite) if scenarios is None else scenarios
+    total = len(models) * sum(1 + bool(case.get("follow_up")) for case in scenarios)
     # One run only, no retries or auto-fallback. Do not overwrite previous evidence.
     output.mkdir(parents=True, exist_ok=False)
     report = {
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "suite": suite, "prompt_sha256": hashlib.sha256(INSTRUCTIONS.encode()).hexdigest(),
         "scenario_sha256": hashlib.sha256(json.dumps(scenarios, sort_keys=True).encode()).hexdigest(),
-        "max_calls": total, "max_output_tokens": 2048,
-        "models": MODEL_SETTINGS, "rubric": DIMENSIONS, "results": [],
+        "max_calls": total, "max_output_tokens": max_output_tokens,
+        "models": {model: MODEL_SETTINGS[model] for model in models}, "rubric": DIMENSIONS, "results": [],
+        "review_required": review is not None, "stopped_early": False,
         "decision": "NOT SCORED. No winner until actual outputs are reviewed.",
     }
     (output / "prompt.txt").write_text(INSTRUCTIONS, encoding="utf-8")
@@ -61,7 +67,7 @@ def run(suite, key, output, adapter_factory=OpenAIResponses):
     attempted = 0
     for scenario_index, case in enumerate(scenarios):
         # Alternate which model is first to reduce fixed ordering bias.
-        names = list(MODEL_SETTINGS)
+        names = list(models)
         if scenario_index % 2:
             names.reverse()
         for model in names:
@@ -73,7 +79,7 @@ def run(suite, key, output, adapter_factory=OpenAIResponses):
             for turn, question in enumerate(questions, 1):
                 telemetry = {}
                 adapter = adapter_factory(key, model, MODEL_SETTINGS[model]["reasoning"], telemetry.update)
-                service = KitchenCoach(adapter, max_output_tokens=2048)
+                service = KitchenCoach(adapter, max_output_tokens=max_output_tokens)
                 row = {"scenario": case["id"], "model_requested": model, "turn": turn,
                        "profile": profile, "prior_messages": list(history), "question": question,
                        "expectation": case["expectation"], "answer": None,
@@ -103,8 +109,20 @@ def run(suite, key, output, adapter_factory=OpenAIResponses):
                     r["estimated_usd"] is None for r in report["results"])
                 (output / "results.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
                 print(f"{case['id']} / {model} / turn {turn}: {row['application_status']}", flush=True)
-                if row["application_status"] != "ok":
-                    break  # No fabricated follow-up context after failed initial response.
+                if review is not None:
+                    # No next call until the operator has read this exact response.
+                    # Review errors, EOF and any explicit stop fail closed.
+                    try:
+                        continue_run = row["application_status"] == "ok" and review(row) is True
+                    except Exception:
+                        continue_run = False
+                    if not continue_run:
+                        stop = True
+                        report["stopped_early"] = True
+                        report["decision"] = "STOPPED. Review the last response; do not resume automatically."
+                    (output / "results.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+                if stop or row["application_status"] != "ok":
+                    break  # No fabricated follow-up context or calls after a stop.
     return report
 
 
