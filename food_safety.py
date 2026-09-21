@@ -5,8 +5,9 @@ No clinical quantities are inferred here. Clinical gating runs first.
 import re
 import unicodedata
 from dataclasses import dataclass
+from food_actions import analyze, unsafe_washing, poultry_cooking, poultry_endpoint
 
-VERSION = "food-safety-v1"
+VERSION = "food-safety-v2"
 
 @dataclass(frozen=True)
 class Decision:
@@ -38,6 +39,9 @@ TEMPS = {
 POLICY_INSTRUCTIONS = """
 FOOD SAFETY POLICY (application rules, independent of model choice)
 Never wash/rinse raw meat or poultry, including with citrus or vinegar.
+Rinsing rice is a different food/action and is permitted. Whenever giving poultry
+cooking instructions, include its internal endpoint of 165 F/74 C measured with
+a food thermometer; do not leave the endpoint to a future turn.
 Prevent raw-food cross-contamination; use clean separate tools for ready-to-eat food.
 Use a thermometer: poultry/leftovers/casseroles 165 F (74 C); ground red meat
 160 F (71 C); whole red-meat steaks/chops/roasts 145 F (63 C) plus 3 minutes rest;
@@ -71,7 +75,7 @@ def decision(topic, ctx=""):
 
 def preflight(profile, history, message):
     m, ctx = norm(message), context(profile, history, message)
-    if has(r"\b(?:wash|rinse|clean)\w*\b.{0,35}\b(?:chicken|poultry|turkey|raw meat)\b", m):
+    if unsafe_washing(analyze(m, ctx)):
         return decision("washing")
     if has(r"\b(?:raw|unwashed)\b.{0,35}\b(?:board|utensil|knife|surface|salad|marinade)\b", m):
         return decision("surfaces")
@@ -92,29 +96,22 @@ def preflight(profile, history, message):
 def screen(profile, history, message, answer):
     """Withhold the entire draft on a recognized risk; never patch a dangerous sentence."""
     a, ctx = norm(answer), context(profile, history, message)
-    # Split on sentences/newlines; don't treat a distant 'not' as negating an action.
-    clauses = re.split(r"(?<!\d)[.!?;]+|[.!?;]+(?!\d)", a)
-    meat = has(r"\b(chicken|poultry|turkey|duck|raw meat|beef|pork)\b", ctx + " " + a)
+    parsed = analyze(a, ctx)
+    washing = unsafe_washing(parsed)
+    if washing:
+        if washing.ambiguous:
+            return Decision("washing-unclear", "Which food do you mean by rinsing? Rice may be rinsed; do not wash or rinse raw poultry. Your meal, flavors and household context stay in this conversation.")
+        return decision("washing")
+    if poultry_cooking(parsed) and not poultry_endpoint(parsed):
+        return Decision("poultry-endpoint",
+                        "Keep the meal and flavors you planned. " + TEMPS["poultry"][2] +
+                        " Your household preferences and ingredient context remain in this conversation.")
+    clauses = [statement.text for statement in parsed.statements]
     for clause in clauses:
-        for action in re.finditer(r"\b(wash\w*|rins\w*|clean\w*|soak\w*)\b", clause):
-            tail = clause[action.end():]
-            prefix = clause[:action.start()]
-            negated = has(r"(?:do not|don't|never|avoid)\s*$", prefix)
-            safe_object = has(r"^ (?:the |your )?(?:rice|hands|vegetables|produce|board\w*|tools|utensils|surfaces)\b", tail)
-            if safe_object and has(r"\b(?:and|plus|along with)\b.{0,15}\b(?:chicken|poultry|turkey|meat)\b", tail):
-                safe_object = False
-            if meat and not negated and not safe_object:
-                return decision("washing")
         if has(r"\bunwashed\b|\breuse\b.{0,40}\b(?:board|knife|utensil)\b|\braw(?:-meat| meat)? marinade\b", clause):
             return decision("surfaces")
-        if has(r"\b(?:juices? (?:run |are )?clear|no longer pink|pinkness)\b", clause):
-            if not has(r"\b(?:not|never|don't|cannot|can't|alone)\b", clause):
-                return decision("temperature", ctx)
-    if meat and has(r"\b(?:same|unwashed)\b.{0,30}\b(?:board|knife|utensil|plate)\b", a):
+    if has(r"\b(?:same|unwashed)\b.{0,30}\b(?:board|knife|utensil|plate)\b", a):
         return decision("surfaces")
-    if meat and has(r"\b(?:done|cooked through|ready to eat|serve)\b", a):
-        if has(r"\b(?:cook|simmer|fry|bake|roast|grill)\w*\b", a) and not has(r"\bthermometer\b", a):
-            return decision("temperature", ctx)
     # Safety-bearing thaw/storage advice is owned by fixed policy, not free text.
     if has(r"\b(?:thaw|defrost)\w*\b", a):
         return decision("thawing")
@@ -124,6 +121,8 @@ def screen(profile, history, message, answer):
         return decision("leftovers")
     # Validate explicit internal temperatures, not clearly identified oven settings.
     for clause in clauses:
+        if (category(clause) or category(ctx)) == "poultry":
+            continue  # Owned by the structured poultry endpoint check above.
         numbers = re.findall(r"(\d+(?:\.\d+)?)\s*(?:degrees?\s*|\u00b0\s*)?([fc])\b", clause)
         if not numbers:
             if has(r"\b(?:internal temperature|degrees? fahrenheit|degrees? celsius)\b", clause):
@@ -133,6 +132,8 @@ def screen(profile, history, message, answer):
             continue
         kind = category(clause) or category(ctx)
         if not kind: return decision("temperature", ctx)
+        if kind == "poultry":
+            continue
         f, c, _ = TEMPS[kind]
         # Accept standard rounded Celsius equivalents (71/63/74).
         for number, unit in numbers:

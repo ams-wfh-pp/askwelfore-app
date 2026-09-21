@@ -1,6 +1,6 @@
 # Kitchen Coach food-safety policy
 
-Development collaborator scope; not deployed. Policy version: food-safety-v1.
+Development collaborator scope; not deployed. Policy version: food-safety-v2.
 Clinical gate version: clinical-gate-v2. Sources checked 21 September 2026.
 
 ## Rules and sources
@@ -16,13 +16,11 @@ Clinical gate version: clinical-gate-v2. Sources checked 21 September 2026.
 
 ## Enforcement
 
-1. Clinical gate runs first and cannot be bypassed by food-policy questions.
-2. Relevant direct handling questions use fixed application text without a model call.
-3. Ordinary cultural/household cooking still uses the configurable model with the compact policy in its instructions.
-4. A separate output check withholds the entire draft when a recognized unsafe or unverified handling instruction is found. It returns the relevant fixed policy response; no partially edited unsafe recipe is served.
-5. Evaluation evidence retains the intercepted draft separately from the delivered answer, and counts its API call and cost. An interception must not be scored as model compliance. Each paid response needs operator review before another call.
+Clinical gating runs first and is unchanged in this revision. Poultry output validation now separates food/action interpretation from policy rules; see [Food/action validation](FOOD_ACTION_VALIDATION.md) for the contract and offline evidence.
 
-Clinical and food-safety code remain outside the model adapter and prompt. The web layer receives only the delivered answer, never the withheld draft. No new service, dependency, database, hosting change or voice integration is required.
+Harmless rice rinsing is permitted. Poultry-cooking instructions require the internal endpoint measured with a food thermometer, before display. Failed validation withholds the whole draft and returns fixed contextual guidance without automatic paid regeneration. Evaluation records retain withheld drafts and count their API usage.
+
+Other existing food-handling controls remain narrowly scoped. No service, dependency, database, hosting change or voice integration was added.
 
 ## Clinical overblocking
 
@@ -36,8 +34,6 @@ Limitations remain: this is conservative English-language routing, not a complet
 
 ## Validation and next gate
 
-Offline tests were written and run before implementing the policy. They initially failed because the food-safety layer did not exist. The expanded suite checks dangerous and benign wording, mixed instructions, temperature units, preserved clinical/allergy context, model-independent operation and evaluation stop controls.
+The revised architecture passes **195 offline tests**, including paired false-positive/false-negative cases and exact saved failures. The clinical gate is unchanged.
 
-The live recheck is limited to eight responses using provisional GPT-4.1 mini: the failed approval/chicken case first, then the seven previously untested responses covering Caribbean flavor, mixed cuisine, limited equipment, household differences and unavailable ingredients/follow-up. It pauses for review after every response and stops on a release-blocking failure. Offline fixture replay is not a new live-model result.
-
-Offline result: **145 passed**. The exact saved failed chicken answer was replayed through the application and withheld in favor of the fixed washing policy, with zero API calls. The eight-response dry run confirms the authorized limit. Live rerun stopped after three calls: a rice-rinsing false positive and a missed complete-cooking thermometer endpoint remain. Release is blocked. See FOOD_SAFETY_EVALUATION.md.
+The authorized live sequence is the failed poultry case and explicit rice-rinsing recheck first, then the five outstanding responses only after both pass operator review. No live v2 result is available yet. Historical v1 failures are preserved in FOOD_SAFETY_EVALUATION.md. Offline passes do not establish release readiness.

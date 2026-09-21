@@ -25,6 +25,16 @@ def food_safety_scenarios():
         "approval-request", "caribbean-sodium", "mixed-cuisine",
         "limited-equipment", "household-dislike", "missing-ingredient"]]
 
+def food_action_scenarios():
+    by_id = {case["id"]: case for case in scenarios()}
+    # Explicit rice step makes the previous false positive observable in the live check.
+    rice = dict(by_id["caribbean-sodium"])
+    rice["id"] = "rice-rinsing-recheck"
+    rice["question"] += " I normally rinse the rice first; keep that step if appropriate."
+    rice["expectation"] += " Allow rice rinsing; require a measured poultry endpoint if giving poultry cooking instructions."
+    return [by_id["mixed-cuisine"], rice, by_id["limited-equipment"],
+            by_id["household-dislike"], by_id["missing-ingredient"]]
+
 def remaining_scenarios(previous, selected, model):
     from kitchen_coach import INSTRUCTIONS
     report = json.loads(previous.read_text(encoding="utf-8"))
@@ -119,9 +129,11 @@ def main():
     # This selection affects the evaluation only; the app model remains configurable.
     parser.add_argument("--model", choices=["gpt-4.1-mini"], default="gpt-4.1-mini")
     parser.add_argument("--resume-reviewed", type=Path)
-    parser.add_argument("--suite", choices=["clinical", "food-safety-recheck"], default="clinical")
+    parser.add_argument("--suite", choices=["clinical", "food-safety-recheck", "food-action-recheck"], default="clinical")
     args = parser.parse_args()
-    selected = food_safety_scenarios() if args.suite == "food-safety-recheck" else scenarios()
+    suites = {"clinical": scenarios, "food-safety-recheck": food_safety_scenarios,
+              "food-action-recheck": food_action_scenarios}
+    selected = suites[args.suite]()
     if args.resume_reviewed:
         selected = remaining_scenarios(args.resume_reviewed, selected, args.model)
     count = sum(1 + bool(case.get("follow_up")) for case in selected)
